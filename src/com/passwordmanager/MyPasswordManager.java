@@ -15,8 +15,10 @@ public final class MyPasswordManager extends JFrame {
   JMenuItem openFile = new JMenuItem(new OpenFileAction());
   JMenuItem saveFile = new JMenuItem(new SaveFileAction());
   JMenuItem importFile = new JMenuItem(new ImportFileAction());
+  JMenuItem exit = new JMenuItem(new ExitAction());
 
   PasswordTableModel model;
+  JTable table;
 
   public MyPasswordManager() throws HeadlessException {
     PasswordController.createList();
@@ -29,11 +31,13 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(saveFile);
     menuFile.addSeparator();
     menuFile.add(importFile);
+    menuFile.addSeparator();
+    menuFile.add(exit);
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("", "grow", "grow"));
     add(panel, BorderLayout.CENTER);
-    JTable table = new JTable(model = new PasswordTableModel());
+    table = new JTable(model = new PasswordTableModel());
     panel.add(new JScrollPane(table), "grow");
 
     JToolBar toolBar = new JToolBar();
@@ -42,10 +46,13 @@ public final class MyPasswordManager extends JFrame {
     toolBar.add(new JButton(new SaveFileAction()));
     toolBar.addSeparator();
     toolBar.add(new JButton(new AddAction()));
+    toolBar.add(new JButton(new DeleteAction()));
     toolBar.setFloatable(true);
     add(toolBar, BorderLayout.NORTH);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    setLocation(0, 0);
+    setSize(screenSize.width, screenSize.height);
     setVisible(true);
   }
 
@@ -76,6 +83,7 @@ public final class MyPasswordManager extends JFrame {
         }
         final String password = JOptionPane.showInputDialog("Enter the password to decode");
         try {
+        	setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.load(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -83,6 +91,7 @@ public final class MyPasswordManager extends JFrame {
           JOptionPane.showMessageDialog(null, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
         }
         model.fireTableDataChanged();
+        setCursor(Cursor.getDefaultCursor());
       }
     }
   }
@@ -103,10 +112,12 @@ public final class MyPasswordManager extends JFrame {
         }
         final String password = JOptionPane.showInputDialog("Enter the password to encode");
         try {
+        	setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.save(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
+        setCursor(Cursor.getDefaultCursor());
       }
     }
   }
@@ -123,6 +134,18 @@ public final class MyPasswordManager extends JFrame {
     }
   }
   
+  class DeleteAction extends AbstractAction {
+	    public DeleteAction() {
+	      super("- Password");
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	      PasswordController.removeItemAt(table.getSelectedRow());
+	      model.fireTableDataChanged();
+	    }
+	  }
+  
   class ImportFileAction extends AbstractAction {
 	    public ImportFileAction() {
 	      super("Import Dashlane...");
@@ -137,9 +160,22 @@ public final class MyPasswordManager extends JFrame {
 	            setCursor(Cursor.getDefaultCursor());
 	            return;
 	          }
+	          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	          PasswordController.importDashlaneCSV(nomFichier);
 	          	model.fireTableDataChanged();
+	          	setCursor(Cursor.getDefaultCursor());
 	        }
+	    }
+	  }
+  
+  class ExitAction extends AbstractAction {
+	    public ExitAction() {
+	      super("Exit");
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	      System.exit(0);
 	    }
 	  }
 

@@ -80,4 +80,12 @@ private static String cleanString(String value) {
 	}
 	return value;
 }
+
+public static void removeItemAt(int row) {
+	if (row == -1) {
+		return;
+	}
+	passwordListData.getPasswordDataList().remove(row);
+	
+}
 }
