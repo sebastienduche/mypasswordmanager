@@ -14,6 +14,7 @@ public final class MyPasswordManager extends JFrame {
   JMenuItem newFile = new JMenuItem(new NewFileAction());
   JMenuItem openFile = new JMenuItem(new OpenFileAction());
   JMenuItem saveFile = new JMenuItem(new SaveFileAction());
+  JMenuItem importFile = new JMenuItem(new ImportFileAction());
 
   PasswordTableModel model;
 
@@ -26,6 +27,8 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(newFile);
     menuFile.add(openFile);
     menuFile.add(saveFile);
+    menuFile.addSeparator();
+    menuFile.add(importFile);
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("", "grow", "grow"));
@@ -119,6 +122,26 @@ public final class MyPasswordManager extends JFrame {
       model.fireTableDataChanged();
     }
   }
+  
+  class ImportFileAction extends AbstractAction {
+	    public ImportFileAction() {
+	      super("Import Dashlane...");
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	    	JFileChooser boiteFichier = new JFileChooser();
+	        if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
+	          File nomFichier = boiteFichier.getSelectedFile();
+	          if (nomFichier == null) {
+	            setCursor(Cursor.getDefaultCursor());
+	            return;
+	          }
+	          PasswordController.importDashlaneCSV(nomFichier);
+	          	model.fireTableDataChanged();
+	        }
+	    }
+	  }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(MyPasswordManager::new);
