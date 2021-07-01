@@ -1,5 +1,6 @@
 package com.passwordmanager;
 
+import com.passwordmanager.exception.InvalidPasswordException;
 import org.apache.commons.net.util.Base64;
 
 import java.io.BufferedReader;

@@ -1,4 +1,8 @@
-package com.passwordmanager;
+package com.passwordmanager.table;
+
+import com.passwordmanager.PasswordController;
+import com.passwordmanager.PasswordData;
+import com.passwordmanager.Utils;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.HashMap;
@@ -7,7 +11,7 @@ import java.util.Map;
 
 public class PasswordTableModel extends DefaultTableModel {
 
-  private final List<String> columns = List.of("Name", "User", "Password", "URL", "Hint", "Comment", "Deprecated");
+  private final List<String> columns = List.of("Name", "User", "Password", "URL", "Hint", "Comment", "Deprecated", "");
   private final Map<Integer, Boolean> deprecatedMap = new HashMap<>();
 
   @Override
@@ -41,6 +45,7 @@ public class PasswordTableModel extends DefaultTableModel {
       case 4: return passwordData.getHint();
       case 5: return passwordData.getComment();
       case 6: return deprecatedMap.getOrDefault(row, Boolean.FALSE);
+      case 7: return Boolean.TRUE;
       default: return "";
     }
   }
@@ -60,6 +65,7 @@ public class PasswordTableModel extends DefaultTableModel {
         passwordData.setDeprecated((Boolean) value);
         break;
       }
+      case 7: Utils.copyToClipboard(passwordData.getPassword()); break;
     }
   }
 }

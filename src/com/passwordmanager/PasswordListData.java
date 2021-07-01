@@ -1,5 +1,8 @@
 package com.passwordmanager;
 
+import com.passwordmanager.exception.InvalidContentException;
+import com.passwordmanager.exception.InvalidPasswordException;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;

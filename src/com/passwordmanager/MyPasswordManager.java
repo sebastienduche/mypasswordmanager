@@ -1,5 +1,13 @@
 package com.passwordmanager;
 
+import com.passwordmanager.exception.DashlaneImportException;
+import com.passwordmanager.exception.InvalidContentException;
+import com.passwordmanager.exception.InvalidPasswordException;
+import com.passwordmanager.table.ButtonCellEditor;
+import com.passwordmanager.table.ButtonCellRenderer;
+import com.passwordmanager.table.CheckboxCellEditor;
+import com.passwordmanager.table.CheckboxCellRenderer;
+import com.passwordmanager.table.PasswordTableModel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -45,18 +53,30 @@ public final class MyPasswordManager extends JFrame {
     panel.setLayout(new MigLayout("", "grow", "grow"));
     add(panel, BorderLayout.CENTER);
     table = new JTable(model = new PasswordTableModel());
+    table.setAutoCreateRowSorter(true);
     TableColumnModel tcm = table.getColumnModel();
     TableColumn tc = tcm.getColumn(6);
     tc.setCellRenderer(new CheckboxCellRenderer());
     tc.setCellEditor(new CheckboxCellEditor());
-    tc.setMinWidth(100);
-    tc.setMaxWidth(100);
+    tc.setMinWidth(80);
+    tc.setMaxWidth(80);
+    tc = tcm.getColumn(7);
+    tc.setCellRenderer(new ButtonCellRenderer("Copy password"));
+    tc.setCellEditor(new ButtonCellEditor());
+    tc.setMinWidth(120);
+    tc.setMaxWidth(120);
     panel.add(new JScrollPane(table), "grow");
 
     JToolBar toolBar = new JToolBar();
-    toolBar.add(new JButton(new NewFileAction()));
-    toolBar.add(new JButton(new OpenFileAction()));
-    toolBar.add(new JButton(new SaveFileAction()));
+    final JButton newButton = new JButton(new NewFileAction());
+    newButton.setText("");
+    toolBar.add(newButton);
+    final JButton openButton = new JButton(new OpenFileAction());
+    openButton.setText("");
+    toolBar.add(openButton);
+    final JButton saveButton = new JButton(new SaveFileAction());
+    saveButton.setText("");
+    toolBar.add(saveButton);
     toolBar.addSeparator();
     toolBar.add(new JButton(new AddAction()));
     toolBar.add(new JButton(new DeleteAction()));
@@ -71,7 +91,7 @@ public final class MyPasswordManager extends JFrame {
 
   class NewFileAction extends AbstractAction {
     public NewFileAction() {
-      super("New File");
+      super("New File", MyPasswordImage.NEW);
     }
 
     @Override
@@ -82,7 +102,7 @@ public final class MyPasswordManager extends JFrame {
 
   class OpenFileAction extends AbstractAction {
     public OpenFileAction() {
-      super("Open File...");
+      super("Open File...", MyPasswordImage.OPEN);
     }
 
     @Override
@@ -111,7 +131,7 @@ public final class MyPasswordManager extends JFrame {
 
   class SaveFileAction extends AbstractAction {
     public SaveFileAction() {
-      super("Save File");
+      super("Save File", MyPasswordImage.SAVE);
     }
 
     @Override
@@ -137,7 +157,7 @@ public final class MyPasswordManager extends JFrame {
 
   class AddAction extends AbstractAction {
     public AddAction() {
-      super("+ Password");
+      super("Password", MyPasswordImage.ADD);
     }
 
     @Override
@@ -149,12 +169,17 @@ public final class MyPasswordManager extends JFrame {
 
   class DeleteAction extends AbstractAction {
     public DeleteAction() {
-      super("- Password");
+      super("Password", MyPasswordImage.DELETE);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      PasswordController.removeItemAt(table.getSelectedRow());
+      final int selectedRow = table.getSelectedRow();
+      if (selectedRow < 0) {
+        JOptionPane.showMessageDialog(null, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      PasswordController.removeItemAt(selectedRow);
       model.fireTableDataChanged();
     }
   }
@@ -174,7 +199,12 @@ public final class MyPasswordManager extends JFrame {
           return;
         }
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        PasswordController.importDashlaneCSV(nomFichier);
+        try {
+          PasswordController.importDashlaneCSV(nomFichier);
+        } catch (DashlaneImportException exception) {
+          exception.printStackTrace();
+          JOptionPane.showMessageDialog(null, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         model.fireTableDataChanged();
         setCursor(Cursor.getDefaultCursor());
       }

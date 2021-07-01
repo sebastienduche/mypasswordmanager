@@ -1,4 +1,4 @@
-package com.passwordmanager;
+package com.passwordmanager.table;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;

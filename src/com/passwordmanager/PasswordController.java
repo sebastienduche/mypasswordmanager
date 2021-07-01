@@ -1,12 +1,17 @@
 package com.passwordmanager;
 
+import com.passwordmanager.exception.DashlaneImportException;
+import com.passwordmanager.exception.InvalidContentException;
+import com.passwordmanager.exception.InvalidPasswordException;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PasswordController {
 
@@ -30,26 +35,22 @@ public class PasswordController {
 	}
 
 	public static List<PasswordData> getPasswords() {
-		return passwordListData.getPasswordDataList();
+		return passwordListData.getPasswordDataList().stream().sorted(Comparator.comparing(PasswordData::getName)).collect(Collectors.toList());
 	}
 
 	public static void addItem(PasswordData passwordData) {
 		passwordListData.getPasswordDataList().add(passwordData);
 	}
 
-	public static void importDashlaneCSV(File file) {
+	public static void importDashlaneCSV(File file) throws DashlaneImportException {
 		if (file == null || !file.exists()) {
 			return;
 		}
 		try (FileReader fileReader = new FileReader(file);
 				 BufferedReader bufferedInputStream = new BufferedReader(fileReader)) {
 			bufferedInputStream.lines().forEach(PasswordController::importLine);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new DashlaneImportException();
 		}
 	}
 

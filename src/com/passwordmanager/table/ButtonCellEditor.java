@@ -1,4 +1,4 @@
-package com.passwordmanager;
+package com.passwordmanager.table;
 
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
@@ -6,20 +6,23 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.EventObject;
 
+
 /**
  * <p>Titre : Cave à vin</p>
  * <p>Description : Votre description</p>
- * <p>Copyright : Copyright (c) 2004</p>
+ * <p>Copyright : Copyright (c) 1998</p>
  * <p>Société : Seb Informatique</p>
  * @author Sébastien Duché
- * @version 0.5
+ * @version 0.4
  * @since 27/05/21
  */
-public final class CheckboxCellEditor extends JCheckBox implements TableCellEditor {
 
-  public CheckboxCellEditor() {
+public final class ButtonCellEditor extends JButton implements TableCellEditor {
+
+  public ButtonCellEditor() {
     super();
     addActionListener((e) -> fireEditingStopped());
+
   }
 
   @Override
@@ -82,8 +85,9 @@ public final class CheckboxCellEditor extends JCheckBox implements TableCellEdit
 
   @Override
   public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-    boolean isSelect = ((Boolean) value);
+    boolean isSelect = (Boolean) value;
     setSelected(isSelect);
     return this;
   }
+
 }
