@@ -83,7 +83,7 @@ public final class MyPasswordManager extends JFrame {
         }
         final String password = JOptionPane.showInputDialog("Enter the password to decode");
         try {
-        	setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.load(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -112,7 +112,7 @@ public final class MyPasswordManager extends JFrame {
         }
         final String password = JOptionPane.showInputDialog("Enter the password to encode");
         try {
-        	setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.save(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -133,51 +133,51 @@ public final class MyPasswordManager extends JFrame {
       model.fireTableDataChanged();
     }
   }
-  
+
   class DeleteAction extends AbstractAction {
-	    public DeleteAction() {
-	      super("- Password");
-	    }
+    public DeleteAction() {
+      super("- Password");
+    }
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-	      PasswordController.removeItemAt(table.getSelectedRow());
-	      model.fireTableDataChanged();
-	    }
-	  }
-  
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      PasswordController.removeItemAt(table.getSelectedRow());
+      model.fireTableDataChanged();
+    }
+  }
+
   class ImportFileAction extends AbstractAction {
-	    public ImportFileAction() {
-	      super("Import Dashlane...");
-	    }
+    public ImportFileAction() {
+      super("Import Dashlane...");
+    }
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-	    	JFileChooser boiteFichier = new JFileChooser();
-	        if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
-	          File nomFichier = boiteFichier.getSelectedFile();
-	          if (nomFichier == null) {
-	            setCursor(Cursor.getDefaultCursor());
-	            return;
-	          }
-	          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	          PasswordController.importDashlaneCSV(nomFichier);
-	          	model.fireTableDataChanged();
-	          	setCursor(Cursor.getDefaultCursor());
-	        }
-	    }
-	  }
-  
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      JFileChooser boiteFichier = new JFileChooser();
+      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
+        File nomFichier = boiteFichier.getSelectedFile();
+        if (nomFichier == null) {
+          setCursor(Cursor.getDefaultCursor());
+          return;
+        }
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        PasswordController.importDashlaneCSV(nomFichier);
+        model.fireTableDataChanged();
+        setCursor(Cursor.getDefaultCursor());
+      }
+    }
+  }
+
   class ExitAction extends AbstractAction {
-	    public ExitAction() {
-	      super("Exit");
-	    }
+    public ExitAction() {
+      super("Exit");
+    }
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-	      System.exit(0);
-	    }
-	  }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      System.exit(0);
+    }
+  }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(MyPasswordManager::new);

@@ -49,16 +49,15 @@ public class FileEncoder {
     return targetByte;
   }
 
-
-    public static String decode(byte[] datas, String password) throws InvalidPasswordException {
-      final byte[] passwordByte = Base64.encodeBase64(password.getBytes());
+  public static String decode(byte[] datas, String password) throws InvalidPasswordException {
+    final byte[] passwordByte = Base64.encodeBase64(password.getBytes());
     int i = 0;
-      for (byte b : passwordByte) {
-        if (b != datas[i]) {
-          throw new InvalidPasswordException();
-        }
-        i += 2;
+    for (byte b : passwordByte) {
+      if (b != datas[i]) {
+        throw new InvalidPasswordException();
       }
+      i += 2;
+    }
     byte[] decode = new byte[datas.length - passwordByte.length];
     i = 0;
     for (int j = 0; j < datas.length; j++) {
@@ -69,6 +68,6 @@ public class FileEncoder {
         decode[j] = datas[i++];
       }
     }
-      return new String(Base64.decodeBase64(decode));
+    return new String(Base64.decodeBase64(decode));
   }
 }
