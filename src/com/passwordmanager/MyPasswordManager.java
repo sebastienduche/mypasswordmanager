@@ -3,22 +3,26 @@ package com.passwordmanager;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
 public final class MyPasswordManager extends JFrame {
 
-  JMenuBar menuBar = new JMenuBar();
-  JMenu menuFile = new JMenu("File");
-  JMenuItem newFile = new JMenuItem(new NewFileAction());
-  JMenuItem openFile = new JMenuItem(new OpenFileAction());
-  JMenuItem saveFile = new JMenuItem(new SaveFileAction());
-  JMenuItem importFile = new JMenuItem(new ImportFileAction());
-  JMenuItem exit = new JMenuItem(new ExitAction());
-
-  PasswordTableModel model;
-  JTable table;
+  private final JMenuBar menuBar = new JMenuBar();
+  private final JMenu menuFile = new JMenu("File");
+  private final JMenu menuPassword = new JMenu("Password");
+  private final JMenuItem newFile = new JMenuItem(new NewFileAction());
+  private final JMenuItem openFile = new JMenuItem(new OpenFileAction());
+  private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
+  private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
+  private final JMenuItem addPassword = new JMenuItem(new AddAction());
+  private final JMenuItem deletePassword = new JMenuItem(new DeleteAction());
+  private final JMenuItem exit = new JMenuItem(new ExitAction());
+  private final PasswordTableModel model;
+  private final JTable table;
 
   public MyPasswordManager() throws HeadlessException {
     PasswordController.createList();
@@ -26,6 +30,7 @@ public final class MyPasswordManager extends JFrame {
     setSize(800, 600);
     setLayout(new BorderLayout());
     menuBar.add(menuFile);
+    menuBar.add(menuPassword);
     menuFile.add(newFile);
     menuFile.add(openFile);
     menuFile.add(saveFile);
@@ -33,11 +38,19 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(importFile);
     menuFile.addSeparator();
     menuFile.add(exit);
+    menuPassword.add(addPassword);
+    menuPassword.add(deletePassword);
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("", "grow", "grow"));
     add(panel, BorderLayout.CENTER);
     table = new JTable(model = new PasswordTableModel());
+    TableColumnModel tcm = table.getColumnModel();
+    TableColumn tc = tcm.getColumn(6);
+    tc.setCellRenderer(new CheckboxCellRenderer());
+    tc.setCellEditor(new CheckboxCellEditor());
+    tc.setMinWidth(100);
+    tc.setMaxWidth(100);
     panel.add(new JScrollPane(table), "grow");
 
     JToolBar toolBar = new JToolBar();
@@ -175,7 +188,9 @@ public final class MyPasswordManager extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      System.exit(0);
+      if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Do you want to quit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+        System.exit(0);
+      }
     }
   }
 
