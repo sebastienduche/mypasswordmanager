@@ -16,6 +16,9 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.prefs.Preferences;
+
+import static javax.swing.Action.NAME;
 
 public final class MyPasswordManager extends JFrame {
 
@@ -28,11 +31,17 @@ public final class MyPasswordManager extends JFrame {
   private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
   private final JMenuItem addPassword = new JMenuItem(new AddAction());
   private final JMenuItem deletePassword = new JMenuItem(new DeleteAction());
+  private final JMenuItem reOpen = new JMenuItem(new ReOpenFileAction());
   private final JMenuItem exit = new JMenuItem(new ExitAction());
   private final PasswordTableModel model;
   private final JTable table;
 
+  private final MyPasswordManager instance;
+  private final Preferences prefs;
+
   public MyPasswordManager() throws HeadlessException {
+    instance = this;
+    prefs = Preferences.userNodeForPackage(getClass());
     PasswordController.createList();
     setTitle("MyPasswordManager");
     setSize(800, 600);
@@ -44,6 +53,13 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(saveFile);
     menuFile.addSeparator();
     menuFile.add(importFile);
+
+    final String file = prefs.get("MyPassworManager.file", "");
+    if (!file.isEmpty()) {
+      menuFile.addSeparator();
+      reOpen.setText("-" + file);
+      menuFile.add(reOpen);
+    }
     menuFile.addSeparator();
     menuFile.add(exit);
     menuPassword.add(addPassword);
@@ -84,8 +100,10 @@ public final class MyPasswordManager extends JFrame {
     add(toolBar, BorderLayout.NORTH);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    setLocation(0, 0);
-    setSize(screenSize.width, screenSize.height);
+    setLocation(Integer.parseInt(prefs.get("MyPassworManager.x", "0")), Integer.parseInt(prefs.get("MyPassworManager.y", "0")));
+    int width = Integer.parseInt(prefs.get("MyPassworManager.width", "0"));
+    int height = Integer.parseInt(prefs.get("MyPassworManager.height", "0"));
+    setSize(width != 0 ? width : screenSize.width, height != 0 ? height : screenSize.height);
     setVisible(true);
   }
 
@@ -108,24 +126,53 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
-      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
+      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
         File nomFichier = boiteFichier.getSelectedFile();
         if (nomFichier == null) {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
         final String password = JOptionPane.showInputDialog("Enter the password to decode");
+        boolean loaded = true;
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.load(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+          loaded = false;
+          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (InvalidPasswordException invalidPasswordException) {
-          JOptionPane.showMessageDialog(null, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+          loaded = false;
+          JOptionPane.showMessageDialog(instance, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        if (loaded) {
+          prefs.put("MyPassworManager.file", nomFichier.getAbsolutePath());
         }
         model.fireTableDataChanged();
         setCursor(Cursor.getDefaultCursor());
       }
+    }
+  }
+
+  class ReOpenFileAction extends AbstractAction {
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      File file = new File(prefs.get("MyPassworManager.file", ""));
+      if (!file.exists()) {
+        JOptionPane.showMessageDialog(instance, "The file doesn't exist : " + file.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+      }
+      final String password = JOptionPane.showInputDialog("Enter the password to decode");
+        try {
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          PasswordController.load(file, password);
+        } catch (InvalidContentException invalidContentException) {
+          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidPasswordException invalidPasswordException) {
+          JOptionPane.showMessageDialog(instance, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        model.fireTableDataChanged();
+        setCursor(Cursor.getDefaultCursor());
     }
   }
 
@@ -137,7 +184,7 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
-      if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(null)) {
+      if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
         File nomFichier = boiteFichier.getSelectedFile();
         if (nomFichier == null) {
           setCursor(Cursor.getDefaultCursor());
@@ -148,7 +195,7 @@ public final class MyPasswordManager extends JFrame {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.save(nomFichier, password);
         } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(null, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
         setCursor(Cursor.getDefaultCursor());
       }
@@ -176,7 +223,7 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       final int selectedRow = table.getSelectedRow();
       if (selectedRow < 0) {
-        JOptionPane.showMessageDialog(null, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(instance, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
       }
       PasswordController.removeItemAt(selectedRow);
@@ -192,7 +239,7 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
-      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
+      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
         File nomFichier = boiteFichier.getSelectedFile();
         if (nomFichier == null) {
           setCursor(Cursor.getDefaultCursor());
@@ -203,7 +250,7 @@ public final class MyPasswordManager extends JFrame {
           PasswordController.importDashlaneCSV(nomFichier);
         } catch (DashlaneImportException exception) {
           exception.printStackTrace();
-          JOptionPane.showMessageDialog(null, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(instance, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
         model.fireTableDataChanged();
         setCursor(Cursor.getDefaultCursor());
@@ -218,7 +265,11 @@ public final class MyPasswordManager extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Do you want to quit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+      if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(instance, "Do you want to quit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+        prefs.put("MyPassworManager.x", "" + getLocation().x);
+        prefs.put("MyPassworManager.y", "" + getLocation().y);
+        prefs.put("MyPassworManager.width", "" + getSize().width);
+        prefs.put("MyPassworManager.height", "" + getSize().height);
         System.exit(0);
       }
     }
