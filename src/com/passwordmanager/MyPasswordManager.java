@@ -132,11 +132,12 @@ public final class MyPasswordManager extends JFrame {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
-        final String password = JOptionPane.showInputDialog("Enter the password to decode");
+        final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
+        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
         boolean loaded = true;
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.load(nomFichier, password);
+          PasswordController.load(nomFichier, openPasswordPanel.getPassword());
         } catch (InvalidContentException invalidContentException) {
           loaded = false;
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -162,10 +163,11 @@ public final class MyPasswordManager extends JFrame {
         JOptionPane.showMessageDialog(instance, "The file doesn't exist : " + file.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
         return;
       }
-      final String password = JOptionPane.showInputDialog("Enter the password to decode");
+      final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
+      JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.load(file, password);
+          PasswordController.load(file, openPasswordPanel.getPassword());
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (InvalidPasswordException invalidPasswordException) {
@@ -190,10 +192,15 @@ public final class MyPasswordManager extends JFrame {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
-        final String password = JOptionPane.showInputDialog("Enter the password to encode");
+        final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
+        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
+        if (!openPasswordPanel.isSamePassword()) {
+          JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.save(nomFichier, password);
+          PasswordController.save(nomFichier, openPasswordPanel.getPassword());
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
