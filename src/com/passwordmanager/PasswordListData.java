@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -43,7 +45,9 @@ public class PasswordListData {
       JAXBContext jaxbContext = JAXBContext.newInstance(PasswordListData.class);
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       assert decodeFile != null;
-      return (PasswordListData) jaxbUnmarshaller.unmarshal(new StringReader(decodeFile));
+      PasswordListData passwordListData = (PasswordListData) jaxbUnmarshaller.unmarshal(new StringReader(decodeFile));
+      Collections.sort(passwordListData.passwordDataList, Comparator.comparing(PasswordData::getName));
+      return passwordListData;
     } catch (IOException | JAXBException e) {
       throw new InvalidContentException();
     }

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,8 +36,8 @@ public class PasswordController {
 	}
 
 	public static List<PasswordData> getPasswords() {
-		return passwordListData.getPasswordDataList().stream().sorted(Comparator.comparing(PasswordData::getName)).collect(Collectors.toList());
-	}
+		return passwordListData.getPasswordDataList();
+		}
 
 	public static void addItem(PasswordData passwordData) {
 		passwordListData.getPasswordDataList().add(passwordData);
@@ -52,7 +53,10 @@ public class PasswordController {
 		} catch (IOException e) {
 			throw new DashlaneImportException();
 		}
+		
+		Collections.sort(passwordListData.getPasswordDataList(), Comparator.comparing(PasswordData::getName));
 	}
+	
 
 	private static void importLine(String line) {
 		String[] values = line.split("\",\"");
