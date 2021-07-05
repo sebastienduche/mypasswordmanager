@@ -10,8 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 public class PasswordTableModel extends DefaultTableModel {
+	
+	public final static int COPY_USER = 2;
+	public final static int COPY_PASSWORD = 4;
+	public final static int DEPRECATED = 8;
 
-  private final List<String> columns = List.of("Name", "User", "Password", "URL", "Hint", "Comment", "Deprecated", "");
+  private final List<String> columns = List.of("Name", "User", "", "Password", "",  "URL", "Hint", "Comment", "Deprecated");
   private final Map<Integer, Boolean> deprecatedMap = new HashMap<>();
 
   @Override
@@ -40,12 +44,13 @@ public class PasswordTableModel extends DefaultTableModel {
     switch (column) {
       case 0: return passwordData.getName();
       case 1: return passwordData.getUser();
-      case 2: return passwordData.getPassword();
-      case 3: return passwordData.getUrl();
-      case 4: return passwordData.getHint();
-      case 5: return passwordData.getComment();
-      case 6: return deprecatedMap.getOrDefault(row, Boolean.FALSE);
-      case 7: return Boolean.TRUE;
+      case 3: return passwordData.getPassword();
+      case 5: return passwordData.getUrl();
+      case 6: return passwordData.getHint();
+      case 7: return passwordData.getComment();
+      case DEPRECATED: return deprecatedMap.getOrDefault(row, Boolean.FALSE);
+      case COPY_PASSWORD: return Boolean.TRUE;
+      case COPY_USER: return Boolean.TRUE;
       default: return "";
     }
   }
@@ -56,16 +61,17 @@ public class PasswordTableModel extends DefaultTableModel {
     switch (column) {
       case 0: passwordData.setName((String) value); break;
       case 1: passwordData.setUser((String) value); break;
-      case 2: passwordData.setPassword((String) value); break;
-      case 3: passwordData.setUrl((String) value); break;
-      case 4: passwordData.setHint((String) value); break;
-      case 5: passwordData.setComment((String) value); break;
-      case 6: {
+      case 3: passwordData.setPassword((String) value); break;
+      case 5: passwordData.setUrl((String) value); break;
+      case 6: passwordData.setHint((String) value); break;
+      case 7: passwordData.setComment((String) value); break;
+      case DEPRECATED: {
         deprecatedMap.put(row, (Boolean) value);
         passwordData.setDeprecated((Boolean) value);
         break;
       }
-      case 7: Utils.copyToClipboard(passwordData.getPassword()); break;
+      case COPY_PASSWORD: Utils.copyToClipboard(passwordData.getPassword()); break;
+      case COPY_USER: Utils.copyToClipboard(passwordData.getUser()); break;
     }
   }
 }

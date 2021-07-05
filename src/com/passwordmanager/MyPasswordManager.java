@@ -71,16 +71,21 @@ public final class MyPasswordManager extends JFrame {
     table = new JTable(model = new PasswordTableModel());
     table.setAutoCreateRowSorter(true);
     TableColumnModel tcm = table.getColumnModel();
-    TableColumn tc = tcm.getColumn(6);
+    TableColumn tc = tcm.getColumn(PasswordTableModel.DEPRECATED);
     tc.setCellRenderer(new CheckboxCellRenderer());
     tc.setCellEditor(new CheckboxCellEditor());
     tc.setMinWidth(80);
     tc.setMaxWidth(80);
-    tc = tcm.getColumn(7);
-    tc.setCellRenderer(new ButtonCellRenderer("Copy password"));
+    tc = tcm.getColumn(PasswordTableModel.COPY_PASSWORD);
+    tc.setCellRenderer(new ButtonCellRenderer("", MyPasswordImage.COPY));
     tc.setCellEditor(new ButtonCellEditor());
-    tc.setMinWidth(120);
-    tc.setMaxWidth(120);
+    tc.setMinWidth(25);
+    tc.setMaxWidth(25);
+    tc = tcm.getColumn(PasswordTableModel.COPY_USER);
+    tc.setCellRenderer(new ButtonCellRenderer("", MyPasswordImage.COPY));
+    tc.setCellEditor(new ButtonCellEditor());
+    tc.setMinWidth(25);
+    tc.setMaxWidth(25);
     panel.add(new JScrollPane(table), "grow");
 
     JToolBar toolBar = new JToolBar();
