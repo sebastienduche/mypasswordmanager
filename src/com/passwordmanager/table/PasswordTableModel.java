@@ -17,7 +17,6 @@ public class PasswordTableModel extends DefaultTableModel {
   public static final int DEPRECATED = 9;
 
   private final List<String> columns = List.of("Name", "User", "", "Password", "",  "URL", "", "Hint", "Comment", "Deprecated");
-  private final Map<Integer, Boolean> deprecatedMap = new HashMap<>();
 
   @Override
   public int getRowCount() {
@@ -52,7 +51,7 @@ public class PasswordTableModel extends DefaultTableModel {
       case OPEN_URL: return Boolean.TRUE;
       case 7: return passwordData.getHint();
       case 8: return passwordData.getComment();
-      case DEPRECATED: return deprecatedMap.getOrDefault(row, Boolean.FALSE);
+      case DEPRECATED: return passwordData.isDeprecated();
       default: return "";
     }
   }
@@ -70,11 +69,7 @@ public class PasswordTableModel extends DefaultTableModel {
       case OPEN_URL: Utils.openUrl(passwordData.getUrl()); break;
       case 7: passwordData.setHint((String) value); break;
       case 8: passwordData.setComment((String) value); break;
-      case DEPRECATED: {
-        deprecatedMap.put(row, (Boolean) value);
-        passwordData.setDeprecated((Boolean) value);
-        break;
-      }
+      case DEPRECATED: passwordData.setDeprecated((Boolean) value); break;
     }
   }
 }

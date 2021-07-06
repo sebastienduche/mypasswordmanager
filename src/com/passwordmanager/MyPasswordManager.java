@@ -238,6 +238,7 @@ public final class MyPasswordManager extends JFrame {
         } else {
           return;
         }
+      }
         final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
         JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
         if (!openPasswordPanel.isSamePassword()) {
@@ -251,7 +252,6 @@ public final class MyPasswordManager extends JFrame {
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
         setCursor(Cursor.getDefaultCursor());
-      }
     }
   }
 
