@@ -27,4 +27,8 @@ public final class OpenPasswordPanel extends JPanel {
   public boolean isSamePassword() {
     return Arrays.toString(passwordField.getPassword()).equals(Arrays.toString(passwordRepeatField.getPassword()));
   }
+  
+  public boolean isEmptyPassword() {
+	return passwordField.getPassword().length == 0 || passwordRepeatField.getPassword().length == 0;
+  }
 }

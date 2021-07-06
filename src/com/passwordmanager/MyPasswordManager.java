@@ -241,6 +241,10 @@ public final class MyPasswordManager extends JFrame {
       }
         final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
         JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
+        if (openPasswordPanel.isEmptyPassword()) {
+            JOptionPane.showMessageDialog(instance, "The passwords can‘t be empty", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+          }
         if (!openPasswordPanel.isSamePassword()) {
           JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
           return;
