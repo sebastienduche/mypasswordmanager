@@ -9,10 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PasswordController {
 
@@ -26,9 +24,8 @@ public class PasswordController {
 		passwordListData.setPasswordDataList(new ArrayList<>());
 	}
 
-	public static boolean load(File file, String password) throws InvalidContentException, InvalidPasswordException {
+	public static void load(File file, String password) throws InvalidContentException, InvalidPasswordException {
 		passwordListData = PasswordListData.load(file, password);
-		return passwordListData != null;
 	}
 
 	public static boolean save(File file, String password) throws InvalidContentException {
@@ -54,7 +51,7 @@ public class PasswordController {
 			throw new DashlaneImportException();
 		}
 		
-		Collections.sort(passwordListData.getPasswordDataList(), Comparator.comparing(PasswordData::getName));
+		passwordListData.getPasswordDataList().sort(Comparator.comparing(PasswordData::getName));
 	}
 	
 
@@ -91,5 +88,12 @@ public class PasswordController {
 			return;
 		}
 		passwordListData.getPasswordDataList().remove(row);
+	}
+
+	public static PasswordData getItemAt(int row) {
+		if (row == -1) {
+			return null;
+		}
+		return passwordListData.getPasswordDataList().get(row);
 	}
 }

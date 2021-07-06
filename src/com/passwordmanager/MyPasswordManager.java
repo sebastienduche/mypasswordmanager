@@ -18,26 +18,24 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.prefs.Preferences;
 
-import static javax.swing.Action.NAME;
-
 public final class MyPasswordManager extends JFrame {
 
-  private final JMenuBar menuBar = new JMenuBar();
-  private final JMenu menuFile = new JMenu("File");
-  private final JMenu menuPassword = new JMenu("Password");
   private final JMenuItem newFile = new JMenuItem(new NewFileAction());
   private final JMenuItem openFile = new JMenuItem(new OpenFileAction());
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
   private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
   private final JMenuItem addPassword = new JMenuItem(new AddAction());
   private final JMenuItem deletePassword = new JMenuItem(new DeleteAction());
-  private final JMenuItem reOpen = new JMenuItem(new ReOpenFileAction());
-  private final JMenuItem exit = new JMenuItem(new ExitAction());
   private final PasswordTableModel model;
   private final JTable table;
 
   private final MyPasswordManager instance;
   private final Preferences prefs;
+  private final JButton saveButton;
+  private final JButton addPasswordButton;
+  private final JButton deletePasswordButton;
+
+  private File openedFile = null;
 
   public MyPasswordManager() throws HeadlessException {
     instance = this;
@@ -46,22 +44,28 @@ public final class MyPasswordManager extends JFrame {
     setTitle("MyPasswordManager");
     setSize(800, 600);
     setLayout(new BorderLayout());
+    JMenuBar menuBar = new JMenuBar();
+    JMenu menuFile = new JMenu("File");
     menuBar.add(menuFile);
+    JMenu menuPassword = new JMenu("Password");
     menuBar.add(menuPassword);
     menuFile.add(newFile);
     menuFile.add(openFile);
+    menuFile.addSeparator();
     menuFile.add(saveFile);
+    menuFile.add(new JMenuItem(new SaveAsFileAction()));
     menuFile.addSeparator();
     menuFile.add(importFile);
 
     final String file = prefs.get("MyPassworManager.file", "");
     if (!file.isEmpty()) {
       menuFile.addSeparator();
+      JMenuItem reOpen = new JMenuItem(new ReOpenFileAction());
       reOpen.setText("-" + file);
       menuFile.add(reOpen);
     }
     menuFile.addSeparator();
-    menuFile.add(exit);
+    menuFile.add(new JMenuItem(new ExitAction()));
     menuPassword.add(addPassword);
     menuPassword.add(deletePassword);
     setJMenuBar(menuBar);
@@ -100,13 +104,14 @@ public final class MyPasswordManager extends JFrame {
     final JButton openButton = new JButton(new OpenFileAction());
     openButton.setText("");
     toolBar.add(openButton);
-    final JButton saveButton = new JButton(new SaveFileAction());
+    saveButton = new JButton(new SaveFileAction());
     saveButton.setText("");
     toolBar.add(saveButton);
     toolBar.addSeparator();
-    toolBar.add(new JButton(new AddAction()));
-    toolBar.add(new JButton(new DeleteAction()));
+    toolBar.add(addPasswordButton = new JButton(new AddAction()));
+    toolBar.add(deletePasswordButton = new JButton(new DeleteAction()));
     toolBar.setFloatable(true);
+    setFileOpened(null);
     add(toolBar, BorderLayout.NORTH);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -117,6 +122,22 @@ public final class MyPasswordManager extends JFrame {
     setVisible(true);
   }
 
+  private void setFileOpened(File file) {
+    boolean opened = (openedFile = file) != null;
+    saveFile.setEnabled(opened);
+    addPassword.setEnabled(opened);
+    deletePassword.setEnabled(opened);
+    importFile.setEnabled(opened);
+    saveButton.setEnabled(opened);
+    addPasswordButton.setEnabled(opened);
+    deletePasswordButton.setEnabled(opened);
+    if (file == null || file.isDirectory()) {
+      setTitle("MyPasswordManager");
+    } else {
+      setTitle("MyPasswordManager - " + file.getAbsolutePath());
+    }
+  }
+
   class NewFileAction extends AbstractAction {
     public NewFileAction() {
       super("New File", MyPasswordImage.NEW);
@@ -124,6 +145,7 @@ public final class MyPasswordManager extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+      setFileOpened(new File(""));
       PasswordController.createList();
     }
   }
@@ -137,8 +159,8 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
-        File nomFichier = boiteFichier.getSelectedFile();
-        if (nomFichier == null) {
+        File file = boiteFichier.getSelectedFile();
+        if (file == null) {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
@@ -147,7 +169,8 @@ public final class MyPasswordManager extends JFrame {
         boolean loaded = true;
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.load(nomFichier, openPasswordPanel.getPassword());
+          PasswordController.load(file, openPasswordPanel.getPassword());
+          setFileOpened(file);
         } catch (InvalidContentException invalidContentException) {
           loaded = false;
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -156,7 +179,7 @@ public final class MyPasswordManager extends JFrame {
           JOptionPane.showMessageDialog(instance, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
         }
         if (loaded) {
-          prefs.put("MyPassworManager.file", nomFichier.getAbsolutePath());
+          prefs.put("MyPassworManager.file", file.getAbsolutePath());
         }
         model.fireTableDataChanged();
         setCursor(Cursor.getDefaultCursor());
@@ -175,16 +198,17 @@ public final class MyPasswordManager extends JFrame {
       }
       final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
       JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
-        try {
-          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.load(file, openPasswordPanel.getPassword());
-        } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (InvalidPasswordException invalidPasswordException) {
-          JOptionPane.showMessageDialog(instance, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        model.fireTableDataChanged();
-        setCursor(Cursor.getDefaultCursor());
+      try {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        PasswordController.load(file, openPasswordPanel.getPassword());
+        setFileOpened(file);
+      } catch (InvalidContentException invalidContentException) {
+        JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+      } catch (InvalidPasswordException invalidPasswordException) {
+        JOptionPane.showMessageDialog(instance, "Wrong password", "Error", JOptionPane.ERROR_MESSAGE);
+      }
+      model.fireTableDataChanged();
+      setCursor(Cursor.getDefaultCursor());
     }
   }
 
@@ -196,9 +220,44 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
+      if (openedFile == null || !openedFile.exists()) {
+        if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
+          openedFile = boiteFichier.getSelectedFile();
+          if (openedFile == null) {
+            setCursor(Cursor.getDefaultCursor());
+            return;
+          }
+        } else {
+          return;
+        }
+        final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
+        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
+        if (!openPasswordPanel.isSamePassword()) {
+          JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
+          return;
+        }
+        try {
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          PasswordController.save(openedFile, openPasswordPanel.getPassword());
+        } catch (InvalidContentException invalidContentException) {
+          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        setCursor(Cursor.getDefaultCursor());
+      }
+    }
+  }
+
+  class SaveAsFileAction extends AbstractAction {
+    public SaveAsFileAction() {
+      super("Save File As...", MyPasswordImage.SAVEAS);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      JFileChooser boiteFichier = new JFileChooser();
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
-        File nomFichier = boiteFichier.getSelectedFile();
-        if (nomFichier == null) {
+        File file = boiteFichier.getSelectedFile();
+        if (file == null) {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
@@ -210,7 +269,7 @@ public final class MyPasswordManager extends JFrame {
         }
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.save(nomFichier, openPasswordPanel.getPassword());
+          PasswordController.save(file, openPasswordPanel.getPassword());
         } catch (InvalidContentException invalidContentException) {
           JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -243,6 +302,13 @@ public final class MyPasswordManager extends JFrame {
         JOptionPane.showMessageDialog(instance, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
       }
+      final PasswordData passwordData = PasswordController.getItemAt(selectedRow);
+      if (passwordData == null) {
+        return;
+      }
+      if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, "Do you really want to delete: " + passwordData.getName() + "?", "Question", JOptionPane.YES_NO_OPTION)) {
+        return;
+      }
       PasswordController.removeItemAt(selectedRow);
       model.fireTableDataChanged();
     }
@@ -257,14 +323,14 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
-        File nomFichier = boiteFichier.getSelectedFile();
-        if (nomFichier == null) {
+        File file = boiteFichier.getSelectedFile();
+        if (file == null) {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-          PasswordController.importDashlaneCSV(nomFichier);
+          PasswordController.importDashlaneCSV(file);
         } catch (DashlaneImportException exception) {
           exception.printStackTrace();
           JOptionPane.showMessageDialog(instance, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
