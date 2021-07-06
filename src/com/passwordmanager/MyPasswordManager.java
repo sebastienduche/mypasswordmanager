@@ -15,6 +15,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.prefs.Preferences;
 
@@ -113,7 +115,13 @@ public final class MyPasswordManager extends JFrame {
     toolBar.setFloatable(true);
     setFileOpened(null);
     add(toolBar, BorderLayout.NORTH);
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        new ExitAction().actionPerformed(null);
+      }
+    });
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     setLocation(Integer.parseInt(prefs.get("MyPassworManager.x", "0")), Integer.parseInt(prefs.get("MyPassworManager.y", "0")));
     int width = Integer.parseInt(prefs.get("MyPassworManager.width", "0"));
