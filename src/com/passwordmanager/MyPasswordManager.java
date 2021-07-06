@@ -86,6 +86,11 @@ public final class MyPasswordManager extends JFrame {
     tc.setCellEditor(new ButtonCellEditor());
     tc.setMinWidth(25);
     tc.setMaxWidth(25);
+    tc = tcm.getColumn(PasswordTableModel.OPEN_URL);
+    tc.setCellRenderer(new ButtonCellRenderer("", MyPasswordImage.EXPORT));
+    tc.setCellEditor(new ButtonCellEditor());
+    tc.setMinWidth(25);
+    tc.setMaxWidth(25);
     panel.add(new JScrollPane(table), "grow");
 
     JToolBar toolBar = new JToolBar();
