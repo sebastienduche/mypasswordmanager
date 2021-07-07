@@ -9,12 +9,19 @@ import com.passwordmanager.table.ButtonCellRenderer;
 import com.passwordmanager.table.CheckboxCellEditor;
 import com.passwordmanager.table.CheckboxCellRenderer;
 import com.passwordmanager.table.PasswordTableModel;
+
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -201,6 +208,8 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
+      boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
+	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
         File file = boiteFichier.getSelectedFile();
         if (file == null) {
@@ -263,6 +272,8 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
+      boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
+	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (openedFile == null || !openedFile.exists()) {
         if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
           openedFile = boiteFichier.getSelectedFile();
@@ -286,6 +297,8 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
+      boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
+	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
         File file = boiteFichier.getSelectedFile();
         if (file == null) {
