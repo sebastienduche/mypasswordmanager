@@ -5,9 +5,7 @@ import com.passwordmanager.PasswordData;
 import com.passwordmanager.Utils;
 
 import javax.swing.table.DefaultTableModel;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PasswordTableModel extends DefaultTableModel {
 

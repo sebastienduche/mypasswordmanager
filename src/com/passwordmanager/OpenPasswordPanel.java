@@ -9,8 +9,10 @@ public final class OpenPasswordPanel extends JPanel {
 
   JPasswordField passwordField = new JPasswordField();
   JPasswordField passwordRepeatField = new JPasswordField();
+  boolean newPassword;
 
   public OpenPasswordPanel(boolean newPassword) {
+    this.newPassword = newPassword;
     setLayout(new MigLayout("", "[]10px[300::]", ""));
     add(new JLabel("Enter password :"));
     add(passwordField, "grow");
@@ -24,11 +26,17 @@ public final class OpenPasswordPanel extends JPanel {
     return new String(passwordField.getPassword());
   }
 
-  public boolean isSamePassword() {
-    return Arrays.toString(passwordField.getPassword()).equals(Arrays.toString(passwordRepeatField.getPassword()));
+  public boolean isDifferentPassword() {
+    if (newPassword) {
+      return !Arrays.toString(passwordField.getPassword()).equals(Arrays.toString(passwordRepeatField.getPassword()));
+    }
+    return false;
   }
-  
+
   public boolean isEmptyPassword() {
-	return passwordField.getPassword().length == 0 || passwordRepeatField.getPassword().length == 0;
+    if (newPassword) {
+      return passwordField.getPassword().length == 0 || passwordRepeatField.getPassword().length == 0;
+    }
+    return passwordField.getPassword().length == 0;
   }
 }

@@ -1,5 +1,6 @@
 package com.passwordmanager;
 
+import com.passwordmanager.component.MyPasswordLabel;
 import com.passwordmanager.exception.DashlaneImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
@@ -36,6 +37,7 @@ public final class MyPasswordManager extends JFrame {
   private final JButton saveButton;
   private final JButton addPasswordButton;
   private final JButton deletePasswordButton;
+  private final MyPasswordLabel infoLabel;
 
   private File openedFile = null;
 
@@ -115,6 +117,11 @@ public final class MyPasswordManager extends JFrame {
     toolBar.setFloatable(true);
     setFileOpened(null);
     add(toolBar, BorderLayout.NORTH);
+    JPanel panelBottom = new JPanel();
+    panelBottom.setLayout(new MigLayout("", "0px[grow]0px", "0px[25:25:25]0px"));
+    panelBottom.add(infoLabel = new MyPasswordLabel(), "center");
+    infoLabel.setForeground(Color.red);
+    add(panelBottom, BorderLayout.SOUTH);
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
       @Override
@@ -144,6 +151,34 @@ public final class MyPasswordManager extends JFrame {
     } else {
       setTitle("MyPasswordManager - " + file.getAbsolutePath());
     }
+  }
+
+  private boolean requestAndValidatePassword(OpenPasswordPanel openPasswordPanel) {
+    JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
+    if (openPasswordPanel.isEmptyPassword()) {
+      JOptionPane.showMessageDialog(instance, "The passwords can‘t be empty", "Error", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+    if (openPasswordPanel.isDifferentPassword()) {
+      JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+    return true;
+  }
+
+  private void save(File file, boolean newPassword) {
+    final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(newPassword);
+    if (!requestAndValidatePassword(openPasswordPanel)) {
+      return;
+    }
+    try {
+      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+      PasswordController.save(file, openPasswordPanel.getPassword());
+      infoLabel.setText("File saved.", true);
+    } catch (InvalidContentException invalidContentException) {
+      JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    setCursor(Cursor.getDefaultCursor());
   }
 
   class NewFileAction extends AbstractAction {
@@ -239,23 +274,7 @@ public final class MyPasswordManager extends JFrame {
           return;
         }
       }
-        final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
-        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
-        if (openPasswordPanel.isEmptyPassword()) {
-            JOptionPane.showMessageDialog(instance, "The passwords can‘t be empty", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-          }
-        if (!openPasswordPanel.isSamePassword()) {
-          JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
-          return;
-        }
-        try {
-          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.save(openedFile, openPasswordPanel.getPassword());
-        } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        setCursor(Cursor.getDefaultCursor());
+      save(openedFile, false);
     }
   }
 
@@ -273,19 +292,7 @@ public final class MyPasswordManager extends JFrame {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
-        final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(true);
-        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
-        if (!openPasswordPanel.isSamePassword()) {
-          JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
-          return;
-        }
-        try {
-          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.save(file, openPasswordPanel.getPassword());
-        } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        setCursor(Cursor.getDefaultCursor());
+        save(file, true);
       }
     }
   }
