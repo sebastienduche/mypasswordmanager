@@ -8,6 +8,8 @@ import java.net.URI;
 
 public class Utils {
 
+  private static final String HTTP = "http://";
+
   public static void copyToClipboard(String text) {
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     StringSelection contents = new StringSelection(text);
@@ -16,8 +18,8 @@ public class Utils {
 
   public static void openUrl(String url) {
     String value = url.toLowerCase().strip();
-    if (!value.startsWith("http://")) {
-      value = "http://" + url;
+    if (!value.startsWith(HTTP)) {
+      value = HTTP + url;
     }
     try {
       Desktop.getDesktop().browse(URI.create(value));

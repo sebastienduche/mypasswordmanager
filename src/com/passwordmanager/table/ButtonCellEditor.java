@@ -36,22 +36,20 @@ public final class ButtonCellEditor extends JButton implements TableCellEditor {
   }
 
   private void fireEditingStopped() {
-    CellEditorListener listener;
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i++) {
       if (listeners[i].equals(CellEditorListener.class)) {
-        listener = (CellEditorListener) listeners[i + 1];
+        CellEditorListener listener = (CellEditorListener) listeners[i + 1];
         listener.editingStopped(changeEvent);
       }
     }
   }
 
   private void fireEditingCanceled() {
-    CellEditorListener listener;
     Object[] listeners = listenerList.getListenerList();
     for (int i = 0; i < listeners.length; i++) {
       if (listeners[i].equals(CellEditorListener.class)) {
-        listener = (CellEditorListener) listeners[i + 1];
+        CellEditorListener listener = (CellEditorListener) listeners[i + 1];
         listener.editingCanceled(changeEvent);
       }
     }

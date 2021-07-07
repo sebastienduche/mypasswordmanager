@@ -7,9 +7,9 @@ import java.util.Arrays;
 
 public final class OpenPasswordPanel extends JPanel {
 
-  JPasswordField passwordField = new JPasswordField();
-  JPasswordField passwordRepeatField = new JPasswordField();
-  boolean newPassword;
+  private final JPasswordField passwordField = new JPasswordField();
+  private final JPasswordField passwordRepeatField = new JPasswordField();
+  private final boolean newPassword;
 
   public OpenPasswordPanel(boolean newPassword) {
     this.newPassword = newPassword;
@@ -27,10 +27,7 @@ public final class OpenPasswordPanel extends JPanel {
   }
 
   public boolean isDifferentPassword() {
-    if (newPassword) {
-      return !Arrays.toString(passwordField.getPassword()).equals(Arrays.toString(passwordRepeatField.getPassword()));
-    }
-    return false;
+    return newPassword && !Arrays.toString(passwordField.getPassword()).equals(Arrays.toString(passwordRepeatField.getPassword()));
   }
 
   public boolean isEmptyPassword() {

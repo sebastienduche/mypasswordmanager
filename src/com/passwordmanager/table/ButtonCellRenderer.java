@@ -42,7 +42,6 @@ public class ButtonCellRenderer extends JButton implements TableCellRenderer {
     }
     boolean isSelect = (Boolean) value;
     setSelected(isSelect);
-//    setFont(Program.FONT_PANEL);
     setText(label);
     if(image != null) {
       setIcon(image);

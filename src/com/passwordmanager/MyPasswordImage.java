@@ -27,15 +27,11 @@ public final class MyPasswordImage {
 	public static final ImageIcon SEARCH = getInstance().getImage("find.gif");
 	public static final ImageIcon OPEN = getInstance().getImage("folder.gif");
 	public static final ImageIcon SAVE = getInstance().getImage("save.png");
-	public static final ImageIcon PLACE = getInstance().getImage("place.gif");
-	public static final ImageIcon MODIFYPLACE = getInstance().getImage("modplace.gif");
-	public static final ImageIcon DELPLACE = getInstance().getImage("delplace.gif");
 	public static final ImageIcon TABLE = getInstance().getImage("table.gif");
 	public static final ImageIcon IMPORT = getInstance().getImage("import.gif");
 	public static final ImageIcon EXPORT = getInstance().getImage("export.gif");
 	public static final ImageIcon PARAMETER = getInstance().getImage("parameters.gif");
 	public static final ImageIcon SAVEAS = getInstance().getImage("saveas.png");
-	public static final ImageIcon WINE = getInstance().getImage("wine.png");
 	public static final ImageIcon ADD = getInstance().getImage("add.png");
 	public static final ImageIcon DELETE = getInstance().getImage("delete.gif");
 	public static final ImageIcon SHOW = getInstance().getImage("glasses.png");
@@ -44,9 +40,6 @@ public final class MyPasswordImage {
 	public static final ImageIcon CUT = getInstance().getImage("Cut16.gif");
 	public static final ImageIcon COPY = getInstance().getImage("Copy16.gif");
 	public static final ImageIcon PASTE = getInstance().getImage("Paste16.gif");
-	public static final ImageIcon WHITEWINE = getInstance().getImage("winegreen.png");
-	public static final ImageIcon BLACKWINE = getInstance().getImage("wineblack.png");
-	public static final ImageIcon PINKWINE = getInstance().getImage("winewhite.png");
 	public static final ImageIcon TRASH = getInstance().getImage("trash.png");
 	public static final ImageIcon RESTORE = getInstance().getImage("restore.png");
 	public static final ImageIcon PDF = getInstance().getImage("pdf.png");
