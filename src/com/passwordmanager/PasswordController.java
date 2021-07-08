@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PasswordController {
 
 	private static PasswordListData passwordListData = null;
+	private static String filter = "";
 
 	private PasswordController() {
 	}
@@ -33,8 +35,14 @@ public class PasswordController {
 	}
 
 	public static List<PasswordData> getPasswords() {
-		return passwordListData.getPasswordDataList();
+		if (filter.isBlank()) {
+			return passwordListData.getPasswordDataList();
 		}
+		return passwordListData.getPasswordDataList()
+				.stream()
+				.filter(passwordData -> passwordData.getName().toLowerCase().contains(filter.toLowerCase()))
+				.collect(Collectors.toList());
+	}
 
 	public static void addItem(PasswordData passwordData) {
 		passwordListData.getPasswordDataList().add(passwordData);
@@ -95,5 +103,13 @@ public class PasswordController {
 			return null;
 		}
 		return passwordListData.getPasswordDataList().get(row);
+	}
+
+	public static void filterPasswords(String value) {
+		if (value == null) {
+			filter = "";
+		} else {
+			filter = value;
+		}
 	}
 }

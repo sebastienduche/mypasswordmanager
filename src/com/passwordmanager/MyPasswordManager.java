@@ -9,13 +9,26 @@ import com.passwordmanager.table.ButtonCellRenderer;
 import com.passwordmanager.table.CheckboxCellEditor;
 import com.passwordmanager.table.CheckboxCellRenderer;
 import com.passwordmanager.table.PasswordTableModel;
-
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -23,6 +36,8 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -44,6 +59,7 @@ public final class MyPasswordManager extends JFrame {
   private final JButton saveButton;
   private final JButton addPasswordButton;
   private final JButton deletePasswordButton;
+  private final JTextField filterTextField;
   private final MyPasswordLabel infoLabel;
 
   private File openedFile = null;
@@ -53,7 +69,6 @@ public final class MyPasswordManager extends JFrame {
     prefs = Preferences.userNodeForPackage(getClass());
     PasswordController.createList();
     setTitle("MyPasswordManager");
-    setSize(800, 600);
     setLayout(new BorderLayout());
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("File");
@@ -81,8 +96,26 @@ public final class MyPasswordManager extends JFrame {
     menuPassword.add(deletePassword);
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
-    panel.setLayout(new MigLayout("", "grow", "grow"));
+    panel.setLayout(new MigLayout("", "grow", "[][grow]"));
     add(panel, BorderLayout.CENTER);
+    filterTextField = new JTextField();
+    filterTextField.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        super.keyPressed(e);
+        final char keyChar = e.getKeyChar();
+        String value = filterTextField.getText();
+        if (Character.isLetterOrDigit(keyChar)) {
+          value += keyChar;
+        }
+        PasswordController.filterPasswords(value);
+        model.fireTableDataChanged();
+      }
+    });
+    final JLabel labelFilter = new JLabel("Search by name:");
+    labelFilter.setHorizontalAlignment(SwingConstants.RIGHT);
+    panel.add(labelFilter, "split 2, growx, align right");
+    panel.add(filterTextField, "w 200, align right, wrap");
     table = new JTable(model = new PasswordTableModel());
     table.setAutoCreateRowSorter(true);
     TableColumnModel tcm = table.getColumnModel();
@@ -209,7 +242,7 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
       boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+      boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
         File file = boiteFichier.getSelectedFile();
         if (file == null) {
@@ -273,7 +306,7 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
       boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+      boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (openedFile == null || !openedFile.exists()) {
         if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
           openedFile = boiteFichier.getSelectedFile();
@@ -298,7 +331,7 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       JFileChooser boiteFichier = new JFileChooser();
       boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-	  boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+      boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
       if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
         File file = boiteFichier.getSelectedFile();
         if (file == null) {

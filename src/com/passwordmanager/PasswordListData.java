@@ -45,7 +45,7 @@ public class PasswordListData {
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       assert decodeFile != null;
       PasswordListData passwordListData = (PasswordListData) jaxbUnmarshaller.unmarshal(new StringReader(decodeFile));
-      passwordListData.passwordDataList.sort(Comparator.comparing(PasswordData::getName));
+      passwordListData.passwordDataList.sort(Comparator.comparing(PasswordData::getName, String.CASE_INSENSITIVE_ORDER));
       return passwordListData;
     } catch (IOException | JAXBException e) {
       throw new InvalidContentException();
