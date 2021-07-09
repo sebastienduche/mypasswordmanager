@@ -41,11 +41,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
-	public static final String INTERNAL_VERSION = "1.0";
+	public static final String INTERNAL_VERSION = "1.1";
   public static final String VERSION = "1";
 
   private final JMenuItem newFile = new JMenuItem(new NewFileAction());
@@ -226,6 +227,35 @@ public final class MyPasswordManager extends JFrame {
     }
     setCursor(Cursor.getDefaultCursor());
   }
+  
+  private static void cleanDebugFiles() {
+		String sDir = System.getProperty("user.home") + File.separator + "MyPasswordManagerDebug";
+		File f = new File(sDir);
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(2);
+		String[] files = f.list((dir, name) -> {
+			String date = "";
+			if (name.startsWith("Debug-") && name.endsWith(".log")) {
+				date = name.substring(6, name.indexOf(".log"));
+			}
+			if (name.startsWith("DebugFtp-") && name.endsWith(".log")) {
+				date = name.substring(9, name.indexOf(".log"));
+			}
+			if (!date.isEmpty()) {
+				String[] fields = date.split("-");
+				LocalDateTime dateTime = now.withMonth(Integer.parseInt(fields[1])).withDayOfMonth(Integer.parseInt(fields[0])).withYear(Integer.parseInt(fields[2]));
+				return dateTime.isBefore(monthsAgo);
+			}
+			return false;
+		});
+
+		if (files != null) {
+			for (String file : files) {
+				f = new File(sDir, file);
+				f.deleteOnExit();
+			}
+		}
+	}
 
   class NewFileAction extends AbstractAction {
     public NewFileAction() {
@@ -424,6 +454,7 @@ public final class MyPasswordManager extends JFrame {
         prefs.put("MyPassworManager.y", "" + getLocation().y);
         prefs.put("MyPassworManager.width", "" + getSize().width);
         prefs.put("MyPassworManager.height", "" + getSize().height);
+        cleanDebugFiles();
         System.exit(0);
       }
     }
