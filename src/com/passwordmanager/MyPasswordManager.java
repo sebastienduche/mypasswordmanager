@@ -78,6 +78,8 @@ public final class MyPasswordManager extends JFrame {
     menuBar.add(menuFile);
     JMenu menuPassword = new JMenu("Password");
     menuBar.add(menuPassword);
+    JMenu menuAbout = new JMenu("?");
+    menuBar.add(menuAbout);
     menuFile.add(newFile);
     menuFile.add(openFile);
     menuFile.addSeparator();
@@ -97,6 +99,7 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(new JMenuItem(new ExitAction()));
     menuPassword.add(addPassword);
     menuPassword.add(deletePassword);
+    menuAbout.add(new JMenuItem(new AboutAction()));
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("", "grow", "[][grow]"));
@@ -425,6 +428,17 @@ public final class MyPasswordManager extends JFrame {
       }
     }
   }
+  
+  class AboutAction extends AbstractAction {
+	    public AboutAction() {
+	      super("About...");
+	    }
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+	      new APropos().setVisible(true);
+	    }
+	  }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(MyPasswordManager::new);
