@@ -1,19 +1,11 @@
 package test;
 
-import java.io.File;
+import com.passwordmanager.MyPasswordManager;
+
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.passwordmanager.MyPasswordManager;
 
 public class GenerateVersionFile {
 
@@ -24,34 +16,12 @@ public class GenerateVersionFile {
       writer.write(MyPasswordManager.INTERNAL_VERSION + "\n");
       writer.write(MyPasswordManager.VERSION + "\n");
       writer.write("MyPasswordManager.jar@" + checksum + "\n");
-      getLibFiles()
-          .forEach(libFile -> {
-            try {
-              String md5 = getMD5Checksum("./Build/lib/" + libFile);
-              writer.write(libFile + "@" + md5 + "\n");
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          });
       writer.flush();
       System.out.println("Checksum");
       System.out.println(checksum);
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  private static List<String> getLibFiles() {
-    try {
-      return Files.walk(Path.of("./Build/lib"), 1, FileVisitOption.FOLLOW_LINKS)
-          .map(Path::toFile)
-          .filter(File::isFile)
-          .map(File::getName)
-          .collect(Collectors.toList());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return new ArrayList<>();
   }
 
   private static byte[] createChecksum(String filename) throws Exception {
