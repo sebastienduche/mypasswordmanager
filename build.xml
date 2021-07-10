@@ -20,6 +20,7 @@
                 <include name="**/*/*MyPasswordManagerVersion*"/>
             </fileset>
             <zipfileset excludes="META-INF/*.SF" src="./lib/GitHubServer.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="./lib/commons-io-2.4.jar"/>
         </jar>
         <jar destfile="Build/MyPasswordManager.jar" filesetmanifest="mergewithoutmain">
             <manifest>
