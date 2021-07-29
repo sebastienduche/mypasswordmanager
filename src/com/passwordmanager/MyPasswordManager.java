@@ -46,7 +46,7 @@ import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
-	public static final String INTERNAL_VERSION = "1.2";
+	public static final String INTERNAL_VERSION = "1.3";
   public static final String VERSION = "1";
 
   private final JMenuItem newFile = new JMenuItem(new NewFileAction());
@@ -388,6 +388,7 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       PasswordController.addItem(new PasswordData());
       model.fireTableDataChanged();
+      table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
     }
   }
 
