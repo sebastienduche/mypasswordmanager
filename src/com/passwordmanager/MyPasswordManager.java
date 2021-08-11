@@ -46,6 +46,10 @@ import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
+	
+	// TODO Menu Change Password
+	// TODO Search through URL
+	// TODO Open URL with https://
 	public static final String INTERNAL_VERSION = "1.3";
   public static final String VERSION = "1";
 
