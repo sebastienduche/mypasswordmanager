@@ -121,7 +121,7 @@ public final class MyPasswordManager extends JFrame {
         model.fireTableDataChanged();
       }
     });
-    final JLabel labelFilter = new JLabel("Search by name:");
+    final JLabel labelFilter = new JLabel("Search by name or URL:");
     labelFilter.setHorizontalAlignment(SwingConstants.RIGHT);
     panel.add(labelFilter, "split 2, growx, align right");
     panel.add(filterTextField, "w 200, align right, wrap");
