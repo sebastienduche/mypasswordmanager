@@ -40,8 +40,13 @@ public class PasswordController {
 		}
 		return passwordListData.getPasswordDataList()
 				.stream()
-				.filter(passwordData -> passwordData.getName().toLowerCase().contains(filter.toLowerCase()))
+				.filter(PasswordController::filterPasswords)
 				.collect(Collectors.toList());
+	}
+
+	private static boolean filterPasswords(PasswordData passwordData) {
+		return passwordData.getName() != null && (passwordData.getName().toLowerCase().contains(filter.toLowerCase()) ||
+				(passwordData.getUrl() != null && passwordData.getUrl().toLowerCase().contains(filter.toLowerCase())));
 	}
 
 	public static void addItem(PasswordData passwordData) {
@@ -58,7 +63,7 @@ public class PasswordController {
 		} catch (IOException e) {
 			throw new DashlaneImportException();
 		}
-		
+
 		passwordListData.getPasswordDataList().sort(Comparator.comparing(PasswordData::getName));
 	}
 	

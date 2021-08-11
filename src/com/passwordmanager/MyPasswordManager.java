@@ -46,15 +46,11 @@ import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
-	
-	// TODO Menu Change Password
-	// TODO Search through URL
-	// TODO Open URL with https://
-	public static final String INTERNAL_VERSION = "1.3";
+  // TODO Menu Change Password
+  // TODO Open URL with https://
+  public static final String INTERNAL_VERSION = "1.4";
   public static final String VERSION = "1";
 
-  private final JMenuItem newFile = new JMenuItem(new NewFileAction());
-  private final JMenuItem openFile = new JMenuItem(new OpenFileAction());
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
   private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
   private final JMenuItem addPassword = new JMenuItem(new AddAction());
@@ -85,7 +81,9 @@ public final class MyPasswordManager extends JFrame {
     menuBar.add(menuPassword);
     JMenu menuAbout = new JMenu("?");
     menuBar.add(menuAbout);
+    JMenuItem newFile = new JMenuItem(new NewFileAction());
     menuFile.add(newFile);
+    JMenuItem openFile = new JMenuItem(new OpenFileAction());
     menuFile.add(openFile);
     menuFile.addSeparator();
     menuFile.add(saveFile);
@@ -224,42 +222,45 @@ public final class MyPasswordManager extends JFrame {
     }
     try {
       setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      PasswordController.save(file, openPasswordPanel.getPassword());
-      infoLabel.setText("File saved.", true);
+      if (PasswordController.save(file, openPasswordPanel.getPassword())) {
+        infoLabel.setText("File saved.", true);
+      } else {
+        infoLabel.setText("Error while saving file.", true);
+      }
     } catch (InvalidContentException invalidContentException) {
       JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
     }
     setCursor(Cursor.getDefaultCursor());
   }
-  
-  private static void cleanDebugFiles() {
-		String sDir = System.getProperty("user.home") + File.separator + "MyPasswordManagerDebug";
-		File f = new File(sDir);
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(2);
-		String[] files = f.list((dir, name) -> {
-			String date = "";
-			if (name.startsWith("Debug-") && name.endsWith(".log")) {
-				date = name.substring(6, name.indexOf(".log"));
-			}
-			if (name.startsWith("DebugFtp-") && name.endsWith(".log")) {
-				date = name.substring(9, name.indexOf(".log"));
-			}
-			if (!date.isEmpty()) {
-				String[] fields = date.split("-");
-				LocalDateTime dateTime = now.withMonth(Integer.parseInt(fields[1])).withDayOfMonth(Integer.parseInt(fields[0])).withYear(Integer.parseInt(fields[2]));
-				return dateTime.isBefore(monthsAgo);
-			}
-			return false;
-		});
 
-		if (files != null) {
-			for (String file : files) {
-				f = new File(sDir, file);
-				f.deleteOnExit();
-			}
-		}
-	}
+  private static void cleanDebugFiles() {
+    String sDir = System.getProperty("user.home") + File.separator + "MyPasswordManagerDebug";
+    File f = new File(sDir);
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(2);
+    String[] files = f.list((dir, name) -> {
+      String date = "";
+      if (name.startsWith("Debug-") && name.endsWith(".log")) {
+        date = name.substring(6, name.indexOf(".log"));
+      }
+      if (name.startsWith("DebugFtp-") && name.endsWith(".log")) {
+        date = name.substring(9, name.indexOf(".log"));
+      }
+      if (!date.isEmpty()) {
+        String[] fields = date.split("-");
+        LocalDateTime dateTime = now.withMonth(Integer.parseInt(fields[1])).withDayOfMonth(Integer.parseInt(fields[0])).withYear(Integer.parseInt(fields[2]));
+        return dateTime.isBefore(monthsAgo);
+      }
+      return false;
+    });
+
+    if (files != null) {
+      for (String file : files) {
+        f = new File(sDir, file);
+        f.deleteOnExit();
+      }
+    }
+  }
 
   class NewFileAction extends AbstractAction {
     public NewFileAction() {
@@ -464,17 +465,17 @@ public final class MyPasswordManager extends JFrame {
       }
     }
   }
-  
-  class AboutAction extends AbstractAction {
-	    public AboutAction() {
-	      super("About...");
-	    }
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-	      new APropos().setVisible(true);
-	    }
-	  }
+  class AboutAction extends AbstractAction {
+    public AboutAction() {
+      super("About...");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      new APropos().setVisible(true);
+    }
+  }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(MyPasswordManager::new);

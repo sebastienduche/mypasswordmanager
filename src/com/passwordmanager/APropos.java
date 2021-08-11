@@ -26,7 +26,7 @@ import java.awt.Toolkit;
  * @version 1.6
  * @since 25/06/20
  */
-class APropos extends JDialog {
+final class APropos extends JDialog {
   private final JButton ok = new JButton("OK");
   private final JLabel MyCellarLabel1 = new JLabel("MyPasswordManager");
   private final JLabel MyCellarLabel2 = new JLabel("Copyright: S.Duché");
