@@ -9,6 +9,7 @@ import java.net.URI;
 public class Utils {
 
   private static final String HTTP = "http://";
+  private static final String HTTPS = "https://";
 
   public static void copyToClipboard(String text) {
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -18,7 +19,7 @@ public class Utils {
 
   public static void openUrl(String url) {
     String value = url.toLowerCase().strip();
-    if (!value.startsWith(HTTP)) {
+    if (!value.startsWith(HTTP) && !value.startsWith(HTTPS)) {
       value = HTTP + url;
     }
     try {
