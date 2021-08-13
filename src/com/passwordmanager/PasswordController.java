@@ -1,5 +1,7 @@
 package com.passwordmanager;
 
+import com.passwordmanager.data.PasswordData;
+import com.passwordmanager.data.PasswordListData;
 import com.passwordmanager.exception.DashlaneImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
@@ -8,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +35,7 @@ public class PasswordController {
 	}
 
 	public static boolean save(File file, String password) throws InvalidContentException {
+		passwordListData.setLastModified(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy hh:mm")));
 		return PasswordListData.save(file, passwordListData, password);
 	}
 
@@ -116,5 +121,9 @@ public class PasswordController {
 		} else {
 			filter = value;
 		}
+	}
+
+	public static String getLastModified() {
+		return passwordListData.getLastModified() == null ? "-" : passwordListData.getLastModified();
 	}
 }

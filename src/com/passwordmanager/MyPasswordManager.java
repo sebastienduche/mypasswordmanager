@@ -1,6 +1,7 @@
 package com.passwordmanager;
 
 import com.passwordmanager.component.MyPasswordLabel;
+import com.passwordmanager.data.PasswordData;
 import com.passwordmanager.exception.DashlaneImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
@@ -47,7 +48,7 @@ import java.util.prefs.Preferences;
 public final class MyPasswordManager extends JFrame {
 
   // TODO Menu Change Password
-  public static final String INTERNAL_VERSION = "1.5";
+  public static final String INTERNAL_VERSION = "1.6";
   public static final String VERSION = "1";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -63,6 +64,7 @@ public final class MyPasswordManager extends JFrame {
   private final JButton addPasswordButton;
   private final JButton deletePasswordButton;
   private final JTextField filterTextField;
+  private final JLabel labelModified;
   private final MyPasswordLabel infoLabel;
 
   private File openedFile = null;
@@ -120,6 +122,9 @@ public final class MyPasswordManager extends JFrame {
         model.fireTableDataChanged();
       }
     });
+    labelModified = new JLabel("-");
+    panel.add(new JLabel("Last Modified:"), "split 4");
+    panel.add(labelModified, "growx, align left");
     final JLabel labelFilter = new JLabel("Search by name or URL:");
     labelFilter.setHorizontalAlignment(SwingConstants.RIGHT);
     panel.add(labelFilter, "split 2, growx, align right");
@@ -187,6 +192,7 @@ public final class MyPasswordManager extends JFrame {
 
   private void setFileOpened(File file) {
     boolean opened = (openedFile = file) != null;
+    labelModified.setText(PasswordController.getLastModified());
     saveFile.setEnabled(opened);
     addPassword.setEnabled(opened);
     deletePassword.setEnabled(opened);
@@ -223,6 +229,7 @@ public final class MyPasswordManager extends JFrame {
       setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       if (PasswordController.save(file, openPasswordPanel.getPassword())) {
         infoLabel.setText("File saved.", true);
+        labelModified.setText(PasswordController.getLastModified());
       } else {
         infoLabel.setText("Error while saving file.", true);
       }

@@ -1,5 +1,6 @@
-package com.passwordmanager;
+package com.passwordmanager.data;
 
+import com.passwordmanager.FileEncoder;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
 
@@ -22,13 +23,23 @@ import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "passwordDataList"
+    "passwordDataList", "lastModified"
 })
 @XmlRootElement(name = "credentials")
 public class PasswordListData {
 
   @XmlElement(name = "credential")
   private List<PasswordData> passwordDataList;
+
+  private String lastModified;
+
+  public String getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(String lastModified) {
+    this.lastModified = lastModified;
+  }
 
   public List<PasswordData> getPasswordDataList() {
     return passwordDataList;

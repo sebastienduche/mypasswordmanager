@@ -1,7 +1,7 @@
 package com.passwordmanager.table;
 
 import com.passwordmanager.PasswordController;
-import com.passwordmanager.PasswordData;
+import com.passwordmanager.data.PasswordData;
 import com.passwordmanager.Utils;
 
 import javax.swing.table.DefaultTableModel;

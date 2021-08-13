@@ -1,4 +1,4 @@
-package com.passwordmanager;
+package com.passwordmanager.data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
