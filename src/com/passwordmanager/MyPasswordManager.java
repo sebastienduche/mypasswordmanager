@@ -48,6 +48,7 @@ import java.util.prefs.Preferences;
 public final class MyPasswordManager extends JFrame {
 
   // TODO Menu Change Password
+  // TODO Fix Add Password after searching
   public static final String INTERNAL_VERSION = "1.6";
   public static final String VERSION = "1";
 
