@@ -38,6 +38,9 @@ public class PasswordTableModel extends DefaultTableModel {
 
   @Override
   public Object getValueAt(int row, int column) {
+	  if (row >= PasswordController.getPasswords().size()) {
+		  return "";
+	  }
     final PasswordData passwordData = PasswordController.getPasswords().get(row);
     switch (column) {
       case 0: return passwordData.getName();

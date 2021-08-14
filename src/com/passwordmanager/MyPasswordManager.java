@@ -48,8 +48,10 @@ import java.util.prefs.Preferences;
 public final class MyPasswordManager extends JFrame {
 
   // TODO Menu Change Password
-  // TODO Fix Add Password after searching
-  public static final String INTERNAL_VERSION = "1.6";
+  // TODO PDF Export
+  // TODO Menu to check the version
+  // TODO Display counter for number of lines
+  public static final String INTERNAL_VERSION = "1.7";
   public static final String VERSION = "1";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -118,6 +120,8 @@ public final class MyPasswordManager extends JFrame {
         String value = filterTextField.getText();
         if (Character.isLetterOrDigit(keyChar)) {
           value += keyChar;
+        } else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && value.length() > 0) {
+        	value = value.substring(0, value.length() - 1);
         }
         PasswordController.filterPasswords(value);
         model.fireTableDataChanged();
@@ -278,6 +282,8 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       setFileOpened(new File(""));
       PasswordController.createList();
+      model.fireTableDataChanged();
+      labelModified.setText("-");
     }
   }
 
@@ -399,6 +405,8 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       PasswordController.addItem(new PasswordData());
+      PasswordController.filterPasswords(null);
+      filterTextField.setText("");
       model.fireTableDataChanged();
       table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
     }
