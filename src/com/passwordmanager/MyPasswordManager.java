@@ -47,16 +47,16 @@ import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
-  // TODO Menu Change Password
   // TODO PDF Export
   // TODO Menu to check the version
-  public static final String INTERNAL_VERSION = "1.8";
+  public static final String INTERNAL_VERSION = "1.9";
   public static final String VERSION = "1";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
   private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
   private final JMenuItem addPassword = new JMenuItem(new AddAction());
   private final JMenuItem deletePassword = new JMenuItem(new DeleteAction());
+  private final JMenuItem changeMasterPassword = new JMenuItem(new ChangeMasterPasswordAction());
   private final PasswordTableModel model;
   private final JTable table;
 
@@ -94,6 +94,8 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(new JMenuItem(new SaveAsFileAction()));
     menuFile.addSeparator();
     menuFile.add(importFile);
+    menuFile.addSeparator();
+    menuFile.add(changeMasterPassword);
 
     final String file = prefs.get("MyPassworManager.file", "");
     if (!file.isEmpty()) {
@@ -211,6 +213,7 @@ public final class MyPasswordManager extends JFrame {
     saveButton.setEnabled(opened);
     addPasswordButton.setEnabled(opened);
     deletePasswordButton.setEnabled(opened);
+    changeMasterPassword.setEnabled(opened);
     if (file == null || file.isDirectory()) {
       setTitle("MyPasswordManager");
     } else {
@@ -218,10 +221,18 @@ public final class MyPasswordManager extends JFrame {
     }
   }
 
-  private boolean requestAndValidatePassword(OpenPasswordPanel openPasswordPanel) {
+  private boolean requestAndValidatePassword(OpenPasswordPanel openPasswordPanel, boolean newPassword, boolean newMaster) {
     JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
     if (openPasswordPanel.isEmptyPassword()) {
-      JOptionPane.showMessageDialog(instance, "The passwords can‘t be empty", "Error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(instance, "The passwords can't be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+    if (!newPassword && !PasswordController.getMasterPassword().equals(openPasswordPanel.getPassword())) {
+      JOptionPane.showMessageDialog(instance, "The password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+      return false;
+    }
+    if (newMaster && !PasswordController.getMasterPassword().equals(openPasswordPanel.getOldPassword())) {
+      JOptionPane.showMessageDialog(instance, "The password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
       return false;
     }
     if (openPasswordPanel.isDifferentPassword()) {
@@ -233,7 +244,7 @@ public final class MyPasswordManager extends JFrame {
 
   private void save(File file, boolean newPassword) {
     final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(newPassword);
-    if (!requestAndValidatePassword(openPasswordPanel)) {
+    if (!requestAndValidatePassword(openPasswordPanel, newPassword, false)) {
       return;
     }
     try {
@@ -375,11 +386,14 @@ public final class MyPasswordManager extends JFrame {
             setCursor(Cursor.getDefaultCursor());
             return;
           }
+          if (!openedFile.getName().toLowerCase().endsWith(Filtre.FILTRE_SINFOS.toString())) {
+            openedFile = new File(openedFile.getAbsolutePath() + Filtre.FILTRE_SINFOS);
+          }
         } else {
           return;
         }
       }
-      save(openedFile, false);
+      save(openedFile, PasswordController.getMasterPassword().isEmpty());
     }
   }
 
@@ -398,6 +412,9 @@ public final class MyPasswordManager extends JFrame {
         if (file == null) {
           setCursor(Cursor.getDefaultCursor());
           return;
+        }
+        if (!file.getName().toLowerCase().endsWith(Filtre.FILTRE_SINFOS.toString())) {
+          file = new File(file.getAbsolutePath() + Filtre.FILTRE_SINFOS);
         }
         save(file, true);
       }
@@ -498,6 +515,22 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       new APropos().setVisible(true);
+    }
+  }
+
+  class ChangeMasterPasswordAction extends AbstractAction {
+    public ChangeMasterPasswordAction() {
+      super("Change File Password...");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel();
+      if (!requestAndValidatePassword(openPasswordPanel, true, true)) {
+        return;
+      }
+      PasswordController.setMasterPassword(openPasswordPanel.getPassword());
+      JOptionPane.showMessageDialog(instance, "You need to save the file to take the new password in account.", "Information", JOptionPane.INFORMATION_MESSAGE);
     }
   }
 

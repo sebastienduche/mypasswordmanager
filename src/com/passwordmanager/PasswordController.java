@@ -21,6 +21,7 @@ public class PasswordController {
 
 	private static PasswordListData passwordListData = null;
 	private static String filter = "";
+	private static String masterPassword = "";
 
 	private PasswordController() {
 	}
@@ -28,9 +29,11 @@ public class PasswordController {
 	public static void createList() {
 		passwordListData = new PasswordListData();
 		passwordListData.setPasswordDataList(new ArrayList<>());
+		masterPassword = "";
 	}
 
 	public static void load(File file, String password) throws InvalidContentException, InvalidPasswordException {
+		masterPassword = password;
 		passwordListData = PasswordListData.load(file, password);
 	}
 
@@ -125,5 +128,13 @@ public class PasswordController {
 
 	public static String getLastModified() {
 		return passwordListData.getLastModified() == null ? "-" : passwordListData.getLastModified();
+	}
+
+	public static void setMasterPassword(String masterPassword) {
+		PasswordController.masterPassword = masterPassword;
+	}
+
+	public static String getMasterPassword() {
+		return masterPassword;
 	}
 }
