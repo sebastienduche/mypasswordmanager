@@ -50,8 +50,7 @@ public final class MyPasswordManager extends JFrame {
   // TODO Menu Change Password
   // TODO PDF Export
   // TODO Menu to check the version
-  // TODO Display counter for number of lines
-  public static final String INTERNAL_VERSION = "1.7";
+  public static final String INTERNAL_VERSION = "1.8";
   public static final String VERSION = "1";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -68,6 +67,7 @@ public final class MyPasswordManager extends JFrame {
   private final JButton deletePasswordButton;
   private final JTextField filterTextField;
   private final JLabel labelModified;
+  private final JLabel labelCount;
   private final MyPasswordLabel infoLabel;
 
   private File openedFile = null;
@@ -109,7 +109,7 @@ public final class MyPasswordManager extends JFrame {
     menuAbout.add(new JMenuItem(new AboutAction()));
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
-    panel.setLayout(new MigLayout("", "grow", "[][grow]"));
+    panel.setLayout(new MigLayout("", "grow", "[][grow][]"));
     add(panel, BorderLayout.CENTER);
     filterTextField = new JTextField();
     filterTextField.addKeyListener(new KeyAdapter() {
@@ -120,7 +120,7 @@ public final class MyPasswordManager extends JFrame {
         String value = filterTextField.getText();
         if (Character.isLetterOrDigit(keyChar)) {
           value += keyChar;
-        } else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && value.length() > 0) {
+        } else if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE && !value.isEmpty()) {
         	value = value.substring(0, value.length() - 1);
         }
         PasswordController.filterPasswords(value);
@@ -128,6 +128,7 @@ public final class MyPasswordManager extends JFrame {
       }
     });
     labelModified = new JLabel("-");
+    labelCount = new JLabel("0");
     panel.add(new JLabel("Last Modified:"), "split 4");
     panel.add(labelModified, "growx, align left");
     final JLabel labelFilter = new JLabel("Search by name or URL:");
@@ -157,7 +158,11 @@ public final class MyPasswordManager extends JFrame {
     tc.setCellEditor(new ButtonCellEditor());
     tc.setMinWidth(25);
     tc.setMaxWidth(25);
-    panel.add(new JScrollPane(table), "grow");
+    panel.add(new JScrollPane(table), "grow, wrap");
+    JLabel labelTotal = new JLabel("Total of password: ");
+    labelTotal.setHorizontalAlignment(SwingConstants.RIGHT);
+    panel.add(labelTotal, "growx, align right, split 2");
+    panel.add(labelCount);
 
     JToolBar toolBar = new JToolBar();
     final JButton newButton = new JButton(new NewFileAction());
@@ -198,6 +203,7 @@ public final class MyPasswordManager extends JFrame {
   private void setFileOpened(File file) {
     boolean opened = (openedFile = file) != null;
     labelModified.setText(PasswordController.getLastModified());
+    labelCount.setText(Integer.toString(PasswordController.getPasswords().size()));
     saveFile.setEnabled(opened);
     addPassword.setEnabled(opened);
     deletePassword.setEnabled(opened);
@@ -284,6 +290,7 @@ public final class MyPasswordManager extends JFrame {
       PasswordController.createList();
       model.fireTableDataChanged();
       labelModified.setText("-");
+      labelCount.setText("0");
     }
   }
 
@@ -408,6 +415,7 @@ public final class MyPasswordManager extends JFrame {
       PasswordController.filterPasswords(null);
       filterTextField.setText("");
       model.fireTableDataChanged();
+      labelCount.setText(Integer.toString(PasswordController.getPasswords().size()));
       table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true));
     }
   }
@@ -428,11 +436,12 @@ public final class MyPasswordManager extends JFrame {
       if (passwordData == null) {
         return;
       }
-      if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, "Do you really want to delete: " + passwordData.getName() + "?", "Question", JOptionPane.YES_NO_OPTION)) {
+      if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, passwordData.getName() == null ? "Do you want really want to delete this line?" : "Do you really want to delete: " + passwordData.getName() + "?", "Question", JOptionPane.YES_NO_OPTION)) {
         return;
       }
       PasswordController.removeItemAt(selectedRow);
       model.fireTableDataChanged();
+      labelCount.setText(Integer.toString(PasswordController.getPasswords().size()));
     }
   }
 
