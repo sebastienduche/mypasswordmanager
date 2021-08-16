@@ -161,7 +161,7 @@ public final class MyPasswordManager extends JFrame {
     tc.setMinWidth(25);
     tc.setMaxWidth(25);
     panel.add(new JScrollPane(table), "grow, wrap");
-    JLabel labelTotal = new JLabel("Total of password: ");
+    JLabel labelTotal = new JLabel("Number of passwords: ");
     labelTotal.setHorizontalAlignment(SwingConstants.RIGHT);
     panel.add(labelTotal, "growx, align right, split 2");
     panel.add(labelCount);
