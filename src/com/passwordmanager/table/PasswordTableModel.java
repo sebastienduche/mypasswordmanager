@@ -1,5 +1,6 @@
 package com.passwordmanager.table;
 
+import com.passwordmanager.MyPasswordManager;
 import com.passwordmanager.PasswordController;
 import com.passwordmanager.data.PasswordData;
 import com.passwordmanager.Utils;
@@ -63,14 +64,24 @@ public class PasswordTableModel extends DefaultTableModel {
     switch (column) {
       case 0: passwordData.setName((String) value); break;
       case 1: passwordData.setUser((String) value); break;
-      case COPY_USER: Utils.copyToClipboard(passwordData.getUser()); break;
+      case COPY_USER: copyUser(passwordData); break;
       case 3: passwordData.setPassword((String) value); break;
-      case COPY_PASSWORD: Utils.copyToClipboard(passwordData.getPassword()); break;
+      case COPY_PASSWORD: copyPassword(passwordData); break;
       case 5: passwordData.setUrl((String) value); break;
       case OPEN_URL: Utils.openUrl(passwordData.getUrl()); break;
       case 7: passwordData.setHint((String) value); break;
       case 8: passwordData.setComment((String) value); break;
       case DEPRECATED: passwordData.setDeprecated((Boolean) value); break;
     }
+  }
+
+  private void copyUser(PasswordData passwordData) {
+    Utils.copyToClipboard(passwordData.getUser());
+    MyPasswordManager.setInfoLabel("User copied.");
+  }
+
+  private void copyPassword(PasswordData passwordData) {
+    Utils.copyToClipboard(passwordData.getPassword());
+    MyPasswordManager.setInfoLabel("Password copied.");
   }
 }

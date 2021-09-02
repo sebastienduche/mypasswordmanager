@@ -49,7 +49,7 @@ public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
   // TODO Menu to check the version
-  public static final String INTERNAL_VERSION = "2.0";
+  public static final String INTERNAL_VERSION = "2.1";
   public static final String VERSION = "2";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -68,7 +68,7 @@ public final class MyPasswordManager extends JFrame {
   private final JTextField filterTextField;
   private final JLabel labelModified;
   private final JLabel labelCount;
-  private final MyPasswordLabel infoLabel;
+  private static final MyPasswordLabel INFO_LABEL = new MyPasswordLabel();
 
   private File openedFile = null;
 
@@ -185,8 +185,8 @@ public final class MyPasswordManager extends JFrame {
     add(toolBar, BorderLayout.NORTH);
     JPanel panelBottom = new JPanel();
     panelBottom.setLayout(new MigLayout("", "0px[grow]0px", "0px[25:25:25]0px"));
-    panelBottom.add(infoLabel = new MyPasswordLabel(), "center");
-    infoLabel.setForeground(Color.red);
+    panelBottom.add(INFO_LABEL, "center");
+    INFO_LABEL.setForeground(Color.red);
     add(panelBottom, BorderLayout.SOUTH);
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
@@ -253,15 +253,19 @@ public final class MyPasswordManager extends JFrame {
     try {
       setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
       if (PasswordController.save(file, openPasswordPanel.getPassword())) {
-        infoLabel.setText("File saved.", true);
+        INFO_LABEL.setText("File saved.", true);
         labelModified.setText(PasswordController.getLastModified());
       } else {
-        infoLabel.setText("Error while saving file.", true);
+        INFO_LABEL.setText("Error while saving file.", true);
       }
     } catch (InvalidContentException invalidContentException) {
       JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
     }
     setCursor(Cursor.getDefaultCursor());
+  }
+
+  public static void setInfoLabel(String text) {
+    INFO_LABEL.setText(text, true);
   }
 
   private static void cleanDebugFiles() {
