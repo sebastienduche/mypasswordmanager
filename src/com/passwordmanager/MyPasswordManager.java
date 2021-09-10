@@ -5,6 +5,7 @@ import com.passwordmanager.data.PasswordData;
 import com.passwordmanager.exception.DashlaneImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
+import com.passwordmanager.launcher.MyPasswordManagerServer;
 import com.passwordmanager.table.ButtonCellEditor;
 import com.passwordmanager.table.ButtonCellRenderer;
 import com.passwordmanager.table.CheckboxCellEditor;
@@ -42,14 +43,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.prefs.Preferences;
 
 public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
-  // TODO Menu to check the version
-  public static final String INTERNAL_VERSION = "2.1";
+  public static final String INTERNAL_VERSION = "2.2";
   public static final String VERSION = "2";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -109,6 +110,7 @@ public final class MyPasswordManager extends JFrame {
     menuPassword.add(addPassword);
     menuPassword.add(deletePassword);
     menuAbout.add(new JMenuItem(new AboutAction()));
+    menuAbout.add(new JMenuItem(new SearchUpdateAction()));
     setJMenuBar(menuBar);
     JPanel panel = new JPanel();
     panel.setLayout(new MigLayout("", "grow", "[][grow][]"));
@@ -522,6 +524,21 @@ public final class MyPasswordManager extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       new APropos().setVisible(true);
+    }
+  }
+
+  class SearchUpdateAction extends AbstractAction {
+    public SearchUpdateAction() {
+      super("Check for update...");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (MyPasswordManagerServer.getInstance().hasAvailableUpdate(INTERNAL_VERSION)) {
+        JOptionPane.showMessageDialog(instance, MessageFormat.format("Version {0} is available (current version: {1}). It will be install when the program will be exited.", MyPasswordManagerServer.getInstance().getAvailableVersion(), INTERNAL_VERSION), "Information", JOptionPane.INFORMATION_MESSAGE);
+      } else {
+        JOptionPane.showMessageDialog(instance, "No Updates available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+      }
     }
   }
 
