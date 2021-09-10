@@ -537,7 +537,7 @@ public final class MyPasswordManager extends JFrame {
       if (MyPasswordManagerServer.getInstance().hasAvailableUpdate(INTERNAL_VERSION)) {
         JOptionPane.showMessageDialog(instance, MessageFormat.format("Version {0} is available (current version: {1}). It will be install when the program will be exited.", MyPasswordManagerServer.getInstance().getAvailableVersion(), INTERNAL_VERSION), "Information", JOptionPane.INFORMATION_MESSAGE);
       } else {
-        JOptionPane.showMessageDialog(instance, "No Updates available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(instance, "No updates available.", "Information", JOptionPane.INFORMATION_MESSAGE);
       }
     }
   }
