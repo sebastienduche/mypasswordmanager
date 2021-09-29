@@ -50,7 +50,7 @@ import java.util.prefs.Preferences;
 public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
-  public static final String INTERNAL_VERSION = "2.2";
+  public static final String INTERNAL_VERSION = "2.3";
   public static final String VERSION = "2";
 
   private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
@@ -252,18 +252,20 @@ public final class MyPasswordManager extends JFrame {
     if (!requestAndValidatePassword(openPasswordPanel, newPassword, false)) {
       return;
     }
-    try {
-      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-      if (PasswordController.save(file, openPasswordPanel.getPassword())) {
-        INFO_LABEL.setText("File saved.", true);
-        labelModified.setText(PasswordController.getLastModified());
-      } else {
-        INFO_LABEL.setText("Error while saving file.", true);
+    SwingUtilities.invokeLater(() -> {
+      try {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (PasswordController.save(file, openPasswordPanel.getPassword())) {
+          INFO_LABEL.setText("File saved.", true);
+          labelModified.setText(PasswordController.getLastModified());
+        } else {
+          INFO_LABEL.setText("Error while saving file.", true);
+        }
+      } catch (InvalidContentException invalidContentException) {
+        JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
       }
-    } catch (InvalidContentException invalidContentException) {
-      JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-    }
-    setCursor(Cursor.getDefaultCursor());
+      setCursor(Cursor.getDefaultCursor());
+    });
   }
 
   public static void setInfoLabel(String text) {
@@ -332,23 +334,25 @@ public final class MyPasswordManager extends JFrame {
         }
         final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
         JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
-        boolean loaded = true;
-        try {
-          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          PasswordController.load(file, openPasswordPanel.getPassword());
-          setFileOpened(file);
-        } catch (InvalidContentException invalidContentException) {
-          loaded = false;
-          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (InvalidPasswordException invalidPasswordException) {
-          loaded = false;
-          JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        if (loaded) {
-          prefs.put("MyPassworManager.file", file.getAbsolutePath());
-        }
-        model.fireTableDataChanged();
-        setCursor(Cursor.getDefaultCursor());
+        SwingUtilities.invokeLater(() -> {
+          boolean loaded = true;
+          try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            PasswordController.load(file, openPasswordPanel.getPassword());
+            setFileOpened(file);
+          } catch (InvalidContentException invalidContentException) {
+            loaded = false;
+            JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+          } catch (InvalidPasswordException invalidPasswordException) {
+            loaded = false;
+            JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
+          }
+          if (loaded) {
+            prefs.put("MyPassworManager.file", file.getAbsolutePath());
+          }
+          model.fireTableDataChanged();
+          setCursor(Cursor.getDefaultCursor());
+        });
       }
     }
   }
@@ -364,17 +368,19 @@ public final class MyPasswordManager extends JFrame {
       }
       final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
       JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
-      try {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        PasswordController.load(file, openPasswordPanel.getPassword());
-        setFileOpened(file);
-      } catch (InvalidContentException invalidContentException) {
-        JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
-      } catch (InvalidPasswordException invalidPasswordException) {
-        JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
-      }
-      model.fireTableDataChanged();
-      setCursor(Cursor.getDefaultCursor());
+      SwingUtilities.invokeLater(() -> {
+        try {
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          PasswordController.load(file, openPasswordPanel.getPassword());
+          setFileOpened(file);
+        } catch (InvalidContentException invalidContentException) {
+          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidPasswordException invalidPasswordException) {
+          JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        model.fireTableDataChanged();
+        setCursor(Cursor.getDefaultCursor());
+      });
     }
   }
 
@@ -458,14 +464,14 @@ public final class MyPasswordManager extends JFrame {
         JOptionPane.showMessageDialog(instance, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
         return;
       }
-      final PasswordData passwordData = PasswordController.getItemAt(selectedRow);
+      final PasswordData passwordData = PasswordController.getPasswords().get(selectedRow);
       if (passwordData == null) {
         return;
       }
       if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, passwordData.getName() == null ? "Do you want really want to delete this line?" : "Do you really want to delete: " + passwordData.getName() + "?", "Question", JOptionPane.YES_NO_OPTION)) {
         return;
       }
-      PasswordController.removeItemAt(selectedRow);
+      PasswordController.removeItem(passwordData);
       model.fireTableDataChanged();
       labelCount.setText(Integer.toString(PasswordController.getPasswords().size()));
     }
@@ -485,15 +491,17 @@ public final class MyPasswordManager extends JFrame {
           setCursor(Cursor.getDefaultCursor());
           return;
         }
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        try {
-          PasswordController.importDashlaneCSV(file);
-        } catch (DashlaneImportException exception) {
-          exception.printStackTrace();
-          JOptionPane.showMessageDialog(instance, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        model.fireTableDataChanged();
-        setCursor(Cursor.getDefaultCursor());
+        SwingUtilities.invokeLater(() -> {
+          setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          try {
+            PasswordController.importDashlaneCSV(file);
+          } catch (DashlaneImportException exception) {
+            exception.printStackTrace();
+            JOptionPane.showMessageDialog(instance, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+          }
+          model.fireTableDataChanged();
+          setCursor(Cursor.getDefaultCursor());
+        });
       }
     }
   }

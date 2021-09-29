@@ -61,6 +61,10 @@ public class PasswordController {
 		passwordListData.getPasswordDataList().add(passwordData);
 	}
 
+	public static void removeItem(PasswordData passwordData) {
+		passwordListData.getPasswordDataList().remove(passwordData);
+	}
+
 	public static void importDashlaneCSV(File file) throws DashlaneImportException {
 		if (file == null || !file.exists()) {
 			return;
@@ -88,7 +92,6 @@ public class PasswordController {
 		passwordData.setUser(cleanString(values[3]));
 		passwordData.setPassword(cleanString(values[5]));
 		addItem(passwordData);
-
 	}
 
 	private static String cleanString(String value) {
@@ -102,20 +105,6 @@ public class PasswordController {
 			value = value.substring(0, value.length() - 1);
 		}
 		return value;
-	}
-
-	public static void removeItemAt(int row) {
-		if (row == -1) {
-			return;
-		}
-		passwordListData.getPasswordDataList().remove(row);
-	}
-
-	public static PasswordData getItemAt(int row) {
-		if (row == -1) {
-			return null;
-		}
-		return passwordListData.getPasswordDataList().get(row);
 	}
 
 	public static void filterPasswords(String value) {
