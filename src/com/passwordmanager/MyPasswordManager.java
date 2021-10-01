@@ -14,6 +14,7 @@ import com.passwordmanager.table.PasswordTableModel;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -23,6 +24,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -79,7 +81,8 @@ public final class MyPasswordManager extends JFrame {
   public MyPasswordManager() throws HeadlessException {
     instance = this;
     prefs = Preferences.userNodeForPackage(getClass());
-    Utils.initResources(Locale.ENGLISH);
+    String locale = prefs.get("MyPassworManager.locale", "en");
+    Utils.initResources(new Locale(locale));
     saveFile = new JMenuItem(new SaveFileAction());
     importFile = new JMenuItem(new ImportFileAction());
     addPassword = new JMenuItem(new AddAction());
@@ -93,6 +96,8 @@ public final class MyPasswordManager extends JFrame {
     menuBar.add(menuFile);
     JMenu menuPassword = new JMenu(getLabel("menu.password"));
     menuBar.add(menuPassword);
+    JMenu menuLanguage = new JMenu(getLabel("menu.language"));
+    menuBar.add(menuLanguage);
     JMenu menuAbout = new JMenu("?");
     menuBar.add(menuAbout);
     JMenuItem newFile = new JMenuItem(new NewFileAction());
@@ -118,6 +123,15 @@ public final class MyPasswordManager extends JFrame {
     menuFile.add(new JMenuItem(new ExitAction()));
     menuPassword.add(addPassword);
     menuPassword.add(deletePassword);
+    ButtonGroup languageGroup = new ButtonGroup();
+    JRadioButtonMenuItem englishMenu = new JRadioButtonMenuItem(new LanguageAction(Locale.ENGLISH));
+    englishMenu.setSelected(Locale.ENGLISH.getLanguage().equals(locale));
+    menuLanguage.add(englishMenu);
+    languageGroup.add(englishMenu);
+    JRadioButtonMenuItem frenchMenuItem = new JRadioButtonMenuItem(new LanguageAction(Locale.FRENCH));
+    frenchMenuItem.setSelected(Locale.FRENCH.getLanguage().equals(locale));
+    menuLanguage.add(frenchMenuItem);
+    languageGroup.add(frenchMenuItem);
     menuAbout.add(new JMenuItem(new AboutAction()));
     menuAbout.add(new JMenuItem(new SearchUpdateAction()));
     setJMenuBar(menuBar);
@@ -577,5 +591,20 @@ public final class MyPasswordManager extends JFrame {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(MyPasswordManager::new);
+  }
+
+  private class LanguageAction extends AbstractAction {
+    private final Locale locale;
+
+    public LanguageAction(Locale locale) {
+      super(getLabel("menu." + locale.getLanguage()));
+      this.locale = locale;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      prefs.put("MyPassworManager.locale", locale.getLanguage());
+      JOptionPane.showMessageDialog(instance, getLabel("languageChanged"), getLabel("information"), JOptionPane.INFORMATION_MESSAGE);
+    }
   }
 }
