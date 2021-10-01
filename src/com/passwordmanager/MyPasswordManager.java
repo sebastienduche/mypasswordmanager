@@ -45,19 +45,22 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.prefs.Preferences;
+
+import static com.passwordmanager.Utils.getLabel;
 
 public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
-  public static final String INTERNAL_VERSION = "2.3";
+  public static final String INTERNAL_VERSION = "2.4";
   public static final String VERSION = "2";
 
-  private final JMenuItem saveFile = new JMenuItem(new SaveFileAction());
-  private final JMenuItem importFile = new JMenuItem(new ImportFileAction());
-  private final JMenuItem addPassword = new JMenuItem(new AddAction());
-  private final JMenuItem deletePassword = new JMenuItem(new DeleteAction());
-  private final JMenuItem changeMasterPassword = new JMenuItem(new ChangeMasterPasswordAction());
+  private final JMenuItem saveFile;
+  private final JMenuItem importFile;
+  private final JMenuItem addPassword;
+  private final JMenuItem deletePassword;
+  private final JMenuItem changeMasterPassword;
   private final PasswordTableModel model;
   private final JTable table;
 
@@ -76,13 +79,19 @@ public final class MyPasswordManager extends JFrame {
   public MyPasswordManager() throws HeadlessException {
     instance = this;
     prefs = Preferences.userNodeForPackage(getClass());
+    Utils.initResources(Locale.ENGLISH);
+    saveFile = new JMenuItem(new SaveFileAction());
+    importFile = new JMenuItem(new ImportFileAction());
+    addPassword = new JMenuItem(new AddAction());
+    deletePassword = new JMenuItem(new DeleteAction());
+    changeMasterPassword = new JMenuItem(new ChangeMasterPasswordAction());
     PasswordController.createList();
     setTitle("MyPasswordManager");
     setLayout(new BorderLayout());
     JMenuBar menuBar = new JMenuBar();
-    JMenu menuFile = new JMenu("File");
+    JMenu menuFile = new JMenu(getLabel("menu.file"));
     menuBar.add(menuFile);
-    JMenu menuPassword = new JMenu("Password");
+    JMenu menuPassword = new JMenu(getLabel("menu.password"));
     menuBar.add(menuPassword);
     JMenu menuAbout = new JMenu("?");
     menuBar.add(menuAbout);
@@ -134,9 +143,9 @@ public final class MyPasswordManager extends JFrame {
     });
     labelModified = new JLabel("-");
     labelCount = new JLabel("0");
-    panel.add(new JLabel("Last Modified:"), "split 4");
+    panel.add(new JLabel(getLabel("lastModified")), "split 4");
     panel.add(labelModified, "growx, align left");
-    final JLabel labelFilter = new JLabel("Search by name or URL:");
+    final JLabel labelFilter = new JLabel(getLabel("searchBy"));
     labelFilter.setHorizontalAlignment(SwingConstants.RIGHT);
     panel.add(labelFilter, "split 2, growx, align right");
     panel.add(filterTextField, "w 200, align right, wrap");
@@ -164,7 +173,7 @@ public final class MyPasswordManager extends JFrame {
     tc.setMinWidth(25);
     tc.setMaxWidth(25);
     panel.add(new JScrollPane(table), "grow, wrap");
-    JLabel labelTotal = new JLabel("Number of passwords: ");
+    JLabel labelTotal = new JLabel(getLabel("totalPassword"));
     labelTotal.setHorizontalAlignment(SwingConstants.RIGHT);
     panel.add(labelTotal, "growx, align right, split 2");
     panel.add(labelCount);
@@ -227,21 +236,21 @@ public final class MyPasswordManager extends JFrame {
   }
 
   private boolean requestAndValidatePassword(OpenPasswordPanel openPasswordPanel, boolean newPassword, boolean newMaster) {
-    JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to encode", JOptionPane.PLAIN_MESSAGE, null);
+    JOptionPane.showMessageDialog(instance, openPasswordPanel, getLabel("passwordToEncode"), JOptionPane.PLAIN_MESSAGE, null);
     if (openPasswordPanel.isEmptyPassword()) {
-      JOptionPane.showMessageDialog(instance, "The passwords can't be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(instance, getLabel("error.emptyPassword"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
       return false;
     }
     if (!newPassword && !PasswordController.getMasterPassword().equals(openPasswordPanel.getPassword())) {
-      JOptionPane.showMessageDialog(instance, "The password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(instance, getLabel("error.incorrectPassword"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
       return false;
     }
     if (newMaster && !PasswordController.getMasterPassword().equals(openPasswordPanel.getOldPassword())) {
-      JOptionPane.showMessageDialog(instance, "The password is incorrect.", "Error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(instance, getLabel("error.incorrectPassword"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
       return false;
     }
     if (openPasswordPanel.isDifferentPassword()) {
-      JOptionPane.showMessageDialog(instance, "The 2 passwords don't match.", "Error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(instance, getLabel("error.nonMatchingPasswords"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
       return false;
     }
     return true;
@@ -256,13 +265,13 @@ public final class MyPasswordManager extends JFrame {
       try {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         if (PasswordController.save(file, openPasswordPanel.getPassword())) {
-          INFO_LABEL.setText("File saved.", true);
+          INFO_LABEL.setText(getLabel("fileSaved"), true);
           labelModified.setText(PasswordController.getLastModified());
         } else {
-          INFO_LABEL.setText("Error while saving file.", true);
+          INFO_LABEL.setText(getLabel("error.savingFile"), true);
         }
       } catch (InvalidContentException invalidContentException) {
-        JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(instance, getLabel("problem"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
       }
       setCursor(Cursor.getDefaultCursor());
     });
@@ -303,7 +312,7 @@ public final class MyPasswordManager extends JFrame {
 
   class NewFileAction extends AbstractAction {
     public NewFileAction() {
-      super("New File", MyPasswordImage.NEW);
+      super(getLabel("menu.newFile"), MyPasswordImage.NEW);
     }
 
     @Override
@@ -318,7 +327,7 @@ public final class MyPasswordManager extends JFrame {
 
   class OpenFileAction extends AbstractAction {
     public OpenFileAction() {
-      super("Open File...", MyPasswordImage.OPEN);
+      super(getLabel("menu.openFile"), MyPasswordImage.OPEN);
     }
 
     @Override
@@ -333,7 +342,7 @@ public final class MyPasswordManager extends JFrame {
           return;
         }
         final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
-        JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
+        JOptionPane.showMessageDialog(instance, openPasswordPanel, getLabel("passwordToDecode"), JOptionPane.PLAIN_MESSAGE, null);
         SwingUtilities.invokeLater(() -> {
           boolean loaded = true;
           try {
@@ -342,10 +351,10 @@ public final class MyPasswordManager extends JFrame {
             setFileOpened(file);
           } catch (InvalidContentException invalidContentException) {
             loaded = false;
-            JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(instance, getLabel("problem"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
           } catch (InvalidPasswordException invalidPasswordException) {
             loaded = false;
-            JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(instance, getLabel("error.wrongPassword"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
           }
           if (loaded) {
             prefs.put("MyPassworManager.file", file.getAbsolutePath());
@@ -363,20 +372,20 @@ public final class MyPasswordManager extends JFrame {
     public void actionPerformed(ActionEvent e) {
       File file = new File(prefs.get("MyPassworManager.file", ""));
       if (!file.exists()) {
-        JOptionPane.showMessageDialog(instance, "The file doesn't exist : " + file.getAbsolutePath(), "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(instance, MessageFormat.format(getLabel("nonExistFile"), file.getAbsolutePath()), getLabel("error"), JOptionPane.ERROR_MESSAGE);
         return;
       }
       final OpenPasswordPanel openPasswordPanel = new OpenPasswordPanel(false);
-      JOptionPane.showMessageDialog(instance, openPasswordPanel, "Enter the password to decode", JOptionPane.PLAIN_MESSAGE, null);
+      JOptionPane.showMessageDialog(instance, openPasswordPanel, getLabel("passwordToDecode"), JOptionPane.PLAIN_MESSAGE, null);
       SwingUtilities.invokeLater(() -> {
         try {
           setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
           PasswordController.load(file, openPasswordPanel.getPassword());
           setFileOpened(file);
         } catch (InvalidContentException invalidContentException) {
-          JOptionPane.showMessageDialog(instance, "Problem!", "Error", JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(instance, getLabel("problem"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
         } catch (InvalidPasswordException invalidPasswordException) {
-          JOptionPane.showMessageDialog(instance, "Wrong password!", "Error", JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(instance, getLabel("error.wrongPassword"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
         }
         model.fireTableDataChanged();
         setCursor(Cursor.getDefaultCursor());
@@ -386,7 +395,7 @@ public final class MyPasswordManager extends JFrame {
 
   class SaveFileAction extends AbstractAction {
     public SaveFileAction() {
-      super("Save File", MyPasswordImage.SAVE);
+      super(getLabel("menu.saveFile"), MyPasswordImage.SAVE);
     }
 
     @Override
@@ -414,7 +423,7 @@ public final class MyPasswordManager extends JFrame {
 
   class SaveAsFileAction extends AbstractAction {
     public SaveAsFileAction() {
-      super("Save File As...", MyPasswordImage.SAVEAS);
+      super(getLabel("menu.saveFileAs"), MyPasswordImage.SAVEAS);
     }
 
     @Override
@@ -438,7 +447,7 @@ public final class MyPasswordManager extends JFrame {
 
   class AddAction extends AbstractAction {
     public AddAction() {
-      super("Password", MyPasswordImage.ADD);
+      super(getLabel("password"), MyPasswordImage.ADD);
     }
 
     @Override
@@ -454,21 +463,21 @@ public final class MyPasswordManager extends JFrame {
 
   class DeleteAction extends AbstractAction {
     public DeleteAction() {
-      super("Password", MyPasswordImage.DELETE);
+      super(getLabel("password"), MyPasswordImage.DELETE);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
       final int selectedRow = table.getSelectedRow();
       if (selectedRow < 0) {
-        JOptionPane.showMessageDialog(instance, "No row selected!", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(instance, getLabel("noRowSelected"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
         return;
       }
       final PasswordData passwordData = PasswordController.getPasswords().get(selectedRow);
       if (passwordData == null) {
         return;
       }
-      if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, passwordData.getName() == null ? "Do you want really want to delete this line?" : "Do you really want to delete: " + passwordData.getName() + "?", "Question", JOptionPane.YES_NO_OPTION)) {
+      if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, passwordData.getName() == null ? getLabel("question.deleteThisLine") : MessageFormat.format(getLabel("question.deletePassword"), passwordData.getName()), getLabel("question"), JOptionPane.YES_NO_OPTION)) {
         return;
       }
       PasswordController.removeItem(passwordData);
@@ -479,7 +488,7 @@ public final class MyPasswordManager extends JFrame {
 
   class ImportFileAction extends AbstractAction {
     public ImportFileAction() {
-      super("Import Dashlane...");
+      super(getLabel("menu.importDashlane"));
     }
 
     @Override
@@ -497,7 +506,7 @@ public final class MyPasswordManager extends JFrame {
             PasswordController.importDashlaneCSV(file);
           } catch (DashlaneImportException exception) {
             exception.printStackTrace();
-            JOptionPane.showMessageDialog(instance, "Error while importing Dashlane CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(instance, getLabel("error.importDashlane"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
           }
           model.fireTableDataChanged();
           setCursor(Cursor.getDefaultCursor());
@@ -508,12 +517,12 @@ public final class MyPasswordManager extends JFrame {
 
   class ExitAction extends AbstractAction {
     public ExitAction() {
-      super("Exit");
+      super(getLabel("menu.exit"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(instance, "Do you want to quit?", "Exit", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+      if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(instance, getLabel("question.exit"), getLabel("exit"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
         prefs.put("MyPassworManager.x", "" + getLocation().x);
         prefs.put("MyPassworManager.y", "" + getLocation().y);
         prefs.put("MyPassworManager.width", "" + getSize().width);
@@ -526,7 +535,7 @@ public final class MyPasswordManager extends JFrame {
 
   class AboutAction extends AbstractAction {
     public AboutAction() {
-      super("About...");
+      super(getLabel("menu.about"));
     }
 
     @Override
@@ -537,22 +546,22 @@ public final class MyPasswordManager extends JFrame {
 
   class SearchUpdateAction extends AbstractAction {
     public SearchUpdateAction() {
-      super("Check for update...");
+      super(getLabel("menu.checkUpdate"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
       if (MyPasswordManagerServer.getInstance().hasAvailableUpdate(INTERNAL_VERSION)) {
-        JOptionPane.showMessageDialog(instance, MessageFormat.format("Version {0} is available (current version: {1}). It will be install when the program will be exited.", MyPasswordManagerServer.getInstance().getAvailableVersion(), INTERNAL_VERSION), "Information", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(instance, MessageFormat.format(getLabel("newVersion"), MyPasswordManagerServer.getInstance().getAvailableVersion(), INTERNAL_VERSION), getLabel("information"), JOptionPane.INFORMATION_MESSAGE);
       } else {
-        JOptionPane.showMessageDialog(instance, "No updates available.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(instance, getLabel("noUpdate"), getLabel("information"), JOptionPane.INFORMATION_MESSAGE);
       }
     }
   }
 
   class ChangeMasterPasswordAction extends AbstractAction {
     public ChangeMasterPasswordAction() {
-      super("Change File Password...");
+      super(getLabel("menu.changePassword"));
     }
 
     @Override
@@ -562,7 +571,7 @@ public final class MyPasswordManager extends JFrame {
         return;
       }
       PasswordController.setMasterPassword(openPasswordPanel.getPassword());
-      JOptionPane.showMessageDialog(instance, "You need to save the file to take the new password in account.", "Information", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(instance, getLabel("changePasswordSave"), getLabel("information"), JOptionPane.INFORMATION_MESSAGE);
     }
   }
 

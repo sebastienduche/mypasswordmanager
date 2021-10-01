@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class Filtre extends FileFilter {
 
-	public static final Filtre FILTRE_SINFOS = new Filtre("sinfos", "Fichier MyPasswordManager");
+	public static final Filtre FILTRE_SINFOS = new Filtre("sinfos", Utils.getLabel("filter.file"));
 	
 	private final List<String> suffixes;
 	private final String description;

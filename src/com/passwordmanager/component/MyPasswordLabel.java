@@ -26,11 +26,6 @@ public final class MyPasswordLabel extends JLabel {
 		setFont(FONT);
 	}
 
-	public MyPasswordLabel(String text) {
-		super(text);
-		setFont(FONT);
-	}
-
 	private void hide(boolean visible) {
 		if (visible) { 
 			setText("");

@@ -8,6 +8,8 @@ import com.passwordmanager.Utils;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
+import static com.passwordmanager.Utils.getLabel;
+
 public class PasswordTableModel extends DefaultTableModel {
 
   public static final int COPY_USER = 2;
@@ -15,7 +17,7 @@ public class PasswordTableModel extends DefaultTableModel {
   public static final int OPEN_URL = 6;
   public static final int DEPRECATED = 9;
 
-  private final List<String> columns = List.of("Name", "User", "", "Password", "",  "URL", "", "Hint", "Comment", "Deprecated");
+  private final List<String> columns = List.of(getLabel("column.name"), getLabel("column.user"), "", getLabel("column.password"), "",  getLabel("column.url"), "", getLabel("column.hint"), getLabel("column.comment"), getLabel("column.deprecated"));
 
   @Override
   public int getRowCount() {
@@ -77,11 +79,11 @@ public class PasswordTableModel extends DefaultTableModel {
 
   private void copyUser(PasswordData passwordData) {
     Utils.copyToClipboard(passwordData.getUser());
-    MyPasswordManager.setInfoLabel("User copied.");
+    MyPasswordManager.setInfoLabel(getLabel("userCopied"));
   }
 
   private void copyPassword(PasswordData passwordData) {
     Utils.copyToClipboard(passwordData.getPassword());
-    MyPasswordManager.setInfoLabel("Password copied.");
+    MyPasswordManager.setInfoLabel(getLabel("passwordCopied"));
   }
 }

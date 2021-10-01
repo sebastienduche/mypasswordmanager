@@ -5,6 +5,8 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import java.util.Arrays;
 
+import static com.passwordmanager.Utils.getLabel;
+
 public final class OpenPasswordPanel extends JPanel {
 
   private final JPasswordField oldPasswordField = new JPasswordField();
@@ -15,10 +17,10 @@ public final class OpenPasswordPanel extends JPanel {
   public OpenPasswordPanel(boolean newPassword) {
     this.newPassword = newPassword;
     setLayout(new MigLayout("", "[]10px[300::]", ""));
-    add(new JLabel("Enter password :"));
+    add(new JLabel(getLabel("passwordPanel.enterPassword")));
     add(passwordField, "grow");
     if (newPassword) {
-      add(new JLabel("Renter password :"), "newline");
+      add(new JLabel(getLabel("passwordPanel.renterPassword")), "newline");
       add(passwordRepeatField, "grow");
     }
   }
@@ -26,11 +28,11 @@ public final class OpenPasswordPanel extends JPanel {
   public OpenPasswordPanel() {
     newPassword = true;
     setLayout(new MigLayout("", "[]10px[300::]", ""));
-    add(new JLabel("Enter Old password :"));
+    add(new JLabel(getLabel("passwordPanel.enterOldPassword")));
     add(oldPasswordField, "grow, wrap");
-    add(new JLabel("Enter New password :"));
+    add(new JLabel(getLabel("passwordPanel.enterNewPassword")));
     add(passwordField, "grow");
-    add(new JLabel("Renter New password :"), "newline");
+    add(new JLabel(getLabel("passwordPanel.renterNewPassword")), "newline");
     add(passwordRepeatField, "grow");
   }
 
