@@ -55,7 +55,7 @@ import static com.passwordmanager.Utils.getLabel;
 public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
-  public static final String INTERNAL_VERSION = "2.5";
+  public static final String INTERNAL_VERSION = "2.6";
   public static final String VERSION = "2";
 
   private final JMenuItem saveFile;
@@ -342,6 +342,9 @@ public final class MyPasswordManager extends JFrame {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+      if (openedFile != null && JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(instance, getLabel("question.createNewFile"), getLabel("question"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
+        return;
+      }
       setFileOpened(new File(""));
       PasswordController.createList();
       model.fireTableDataChanged();
