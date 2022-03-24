@@ -55,7 +55,7 @@ import static com.passwordmanager.Utils.getLabel;
 public final class MyPasswordManager extends JFrame {
 
   // TODO PDF Export
-  public static final String INTERNAL_VERSION = "2.6";
+  public static final String INTERNAL_VERSION = "2.7";
   public static final String VERSION = "2";
 
   private final JMenuItem saveFile;

@@ -50,7 +50,6 @@ final class APropos extends JDialog {
    *
    */
   private void jbInit() {
-   // IconPanel ip = new IconPanel(MyPasswordImage.ICON);
     ok.addActionListener((e) -> dispose());
     MyCellarLabel1.setForeground(Color.red);
     MyCellarLabel1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -61,7 +60,6 @@ final class APropos extends JDialog {
     setLayout(new MigLayout("","[][]","[]"));
     add(MyCellarLabel1,"center, span 2, wrap");
     add(MyCellarLabel2,"gaptop 20px, wrap");
-    //add(ip, "spany 3, wmin 64, hmin 64, wrap");
     add(MyCellarLabel3,"wrap");
     add(MyCellarLabel4,"wrap");
     add(ok,"gaptop 20px, span 2, center");

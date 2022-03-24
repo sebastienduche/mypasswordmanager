@@ -12,6 +12,7 @@ public class PasswordData {
   private String hint;
   private String comment;
   private boolean deprecated;
+  private String dateToChange;
 
   public PasswordData() {
   }
@@ -70,5 +71,14 @@ public class PasswordData {
 
   public void setUser(String user) {
     this.user = user;
+  }
+
+  public String getDateToChange() {
+    return dateToChange;
+  }
+
+  public PasswordData setDateToChange(String dateToChange) {
+    this.dateToChange = dateToChange;
+    return this;
   }
 }

@@ -15,9 +15,9 @@ public class PasswordTableModel extends DefaultTableModel {
   public static final int COPY_USER = 2;
   public static final int COPY_PASSWORD = 4;
   public static final int OPEN_URL = 6;
-  public static final int DEPRECATED = 9;
+  public static final int DEPRECATED = 10;
 
-  private final List<String> columns = List.of(getLabel("column.name"), getLabel("column.user"), "", getLabel("column.password"), "",  getLabel("column.url"), "", getLabel("column.hint"), getLabel("column.comment"), getLabel("column.deprecated"));
+  private final List<String> columns = List.of(getLabel("column.name"), getLabel("column.user"), "", getLabel("column.password"), "",  getLabel("column.url"), "", getLabel("column.hint"), getLabel("column.comment"), getLabel("column.toRenew"), getLabel("column.deprecated"));
 
   @Override
   public int getRowCount() {
@@ -55,6 +55,7 @@ public class PasswordTableModel extends DefaultTableModel {
       case OPEN_URL: return Boolean.TRUE;
       case 7: return passwordData.getHint();
       case 8: return passwordData.getComment();
+      case 9: return passwordData.getDateToChange();
       case DEPRECATED: return passwordData.isDeprecated();
       default: return "";
     }
@@ -73,6 +74,7 @@ public class PasswordTableModel extends DefaultTableModel {
       case OPEN_URL: Utils.openUrl(passwordData.getUrl()); break;
       case 7: passwordData.setHint((String) value); break;
       case 8: passwordData.setComment((String) value); break;
+      case 9: passwordData.setDateToChange((String) value); break;
       case DEPRECATED: passwordData.setDeprecated((Boolean) value); break;
     }
   }
