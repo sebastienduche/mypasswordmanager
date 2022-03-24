@@ -16,6 +16,8 @@ import java.awt.*;
  */
 public class ButtonCellRenderer extends JButton implements TableCellRenderer {
 
+
+  private static final long serialVersionUID = 3925857987640887585L;
   private final String label;
   private ImageIcon image;
 
