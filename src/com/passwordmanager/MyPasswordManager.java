@@ -6,17 +6,15 @@ import com.passwordmanager.exception.DashlaneImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
 import com.passwordmanager.launcher.MyPasswordManagerServer;
-import com.passwordmanager.pdf.PDFPageProperties;
-import com.passwordmanager.pdf.PDFProperties;
-import com.passwordmanager.pdf.PDFRow;
-import com.passwordmanager.pdf.PDFTools;
 import com.passwordmanager.table.ButtonCellEditor;
 import com.passwordmanager.table.ButtonCellRenderer;
 import com.passwordmanager.table.CheckboxCellEditor;
 import com.passwordmanager.table.CheckboxCellRenderer;
 import com.passwordmanager.table.PasswordTableModel;
+import com.sebastienduche.pdf.PDFProperties;
+import com.sebastienduche.pdf.PDFRow;
+import com.sebastienduche.pdf.PDFTools;
 import net.miginfocom.swing.MigLayout;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -63,7 +61,7 @@ import static com.passwordmanager.Utils.getLabel;
 
 public final class MyPasswordManager extends JFrame {
 
-    public static final String INTERNAL_VERSION = "3.0";
+    public static final String INTERNAL_VERSION = "3.1";
     public static final String VERSION = "3";
     private static final MyPasswordLabel INFO_LABEL = new MyPasswordLabel();
     private final JMenuItem saveFile;
@@ -620,14 +618,11 @@ public final class MyPasswordManager extends JFrame {
                 }
             }
             try {
-                PDFProperties properties = new PDFProperties(getLabel("passwords"), 10, 10, true, true);
-                properties.addColumn("1", 0, 5, getLabel("column.name"));
-                properties.addColumn("2", 1, 7, getLabel("column.user"));
-                properties.addColumn("3", 2, 3, getLabel("column.hint"));
+                PDFProperties properties = new PDFProperties(getLabel("passwords"), 10, 10, true, true, 10);
+                properties.addColumn(5, getLabel("column.name"));
+                properties.addColumn(7, getLabel("column.user"));
+                properties.addColumn(3, getLabel("column.hint"));
                 final PDFTools pdf = new PDFTools(properties, true);
-                pdf.addTitle(20);
-                PDFPageProperties pageProperties = new PDFPageProperties(30, 20, 20, 20, PDType1Font.HELVETICA, properties.getFontSize());
-                pageProperties.setStartTop(50);
                 ArrayList<PDFRow> listRows = new ArrayList<>();
                 for (PasswordData data : PasswordController.getPasswords()) {
                     final PDFRow pdfRow = new PDFRow();
@@ -636,7 +631,7 @@ public final class MyPasswordManager extends JFrame {
                     pdfRow.addCell(cleanString(data.getHint()));
                     listRows.add(pdfRow);
                 }
-                pdf.drawTable(pageProperties, listRows);
+                pdf.writeData(listRows);
                 pdf.save(exportFile);
                 INFO_LABEL.setText(getLabel("fileSaved"), true);
             } catch (IOException ex) {
