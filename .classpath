@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/GitHubServer-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/pdfbox-app-2.0.5.jar"/>
+	<classpathentry kind="lib" path="lib/my-pdf-generator-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
