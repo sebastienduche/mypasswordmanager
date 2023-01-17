@@ -61,7 +61,7 @@ import static com.passwordmanager.Utils.getLabel;
 
 public final class MyPasswordManager extends JFrame {
 
-    public static final String INTERNAL_VERSION = "3.6";
+    public static final String INTERNAL_VERSION = "3.7";
     public static final String VERSION = "4";
     private static final MyPasswordLabel INFO_LABEL = new MyPasswordLabel();
     private final JMenuItem saveFile;
