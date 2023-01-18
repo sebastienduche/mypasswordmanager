@@ -8,12 +8,13 @@ import java.io.IOException;
 
 public class MyPasswordManagerVersion {
 
+	private static final String VERSION_FILE = "MyPasswordManagerVersion.txt";
+
 	public static String getLocalVersion() {
 		// In directory bin
-		File versionFile = new File("MyPasswordManagerVersion.txt");
+		File versionFile = new File(VERSION_FILE);
 		if (versionFile.exists()) {
-    		try(var bufferReader = new BufferedReader(new FileReader(versionFile)))
-    		{
+    		try (var bufferReader = new BufferedReader(new FileReader(versionFile))) {
     			return bufferReader.readLine();
     		} catch (IOException e) {
     			e.printStackTrace();
@@ -25,7 +26,7 @@ public class MyPasswordManagerVersion {
 	}
 	
 	public static void setLocalVersion(String version) {
-		File f = new File("MyPasswordManagerVersion.txt");
+		File f = new File(VERSION_FILE);
 		try (var writer = new FileWriter(f)) {
 			writer.write(version);
 			writer.flush();
