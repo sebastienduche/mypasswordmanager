@@ -25,18 +25,17 @@ public class CryptoUtils {
         // iterationCount = 65536
         // keyLength = 256
         KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
-        SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-        return secret;
+      return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
     }
 
     // hex representation
-    public static String hex(byte[] bytes) {
-        StringBuilder result = new StringBuilder();
-        for (byte b : bytes) {
-            result.append(String.format("%02x", b));
-        }
-        return result.toString();
-    }
+//    public static String hex(byte[] bytes) {
+//        StringBuilder result = new StringBuilder();
+//        for (byte b : bytes) {
+//            result.append(String.format("%02x", b));
+//        }
+//        return result.toString();
+//    }
 
 }

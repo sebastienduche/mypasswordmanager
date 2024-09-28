@@ -81,4 +81,15 @@ public class Utils {
         return value;
     }
 
+    public static String removeFromString(String value, String toRemove, String toAdd) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        if (value.contains(toRemove)) {
+            int i = value.indexOf(toRemove);
+            return value.substring(0, i) + toAdd + value.substring(i+toRemove.length());
+        }
+        return value;
+    }
+
 }

@@ -2,7 +2,7 @@ package com.passwordmanager;
 
 import com.passwordmanager.component.MyPasswordLabel;
 import com.passwordmanager.data.PasswordData;
-import com.passwordmanager.exception.DashlaneImportException;
+import com.passwordmanager.exception.ApplicationImportException;
 import com.passwordmanager.exception.InvalidContentException;
 import com.passwordmanager.exception.InvalidPasswordException;
 import com.passwordmanager.launcher.MyPasswordManagerServer;
@@ -61,8 +61,8 @@ import static com.passwordmanager.Utils.getLabel;
 
 public final class MyPasswordManager extends JFrame {
 
-    public static final String INTERNAL_VERSION = "3.7";
-    public static final String VERSION = "4";
+    public static final String INTERNAL_VERSION = "4.1";
+    public static final String VERSION = "5";
     private static final MyPasswordLabel INFO_LABEL = new MyPasswordLabel();
     private final JMenuItem saveFile;
     private final JMenuItem importFile;
@@ -78,7 +78,7 @@ public final class MyPasswordManager extends JFrame {
     private final JButton saveButton;
     private final JButton addPasswordButton;
     private final JButton deletePasswordButton;
-    private final JButton exporttoPdfButton;
+    private final JButton exportToPdfButton;
     private final JTextField filterTextField;
     private final JLabel labelModified;
     private final JLabel labelCount;
@@ -212,8 +212,8 @@ public final class MyPasswordManager extends JFrame {
         saveButton.setText("");
         toolBar.add(saveButton);
         toolBar.addSeparator();
-        toolBar.add(exporttoPdfButton = new JButton(new ExportToPdfAction()));
-        exporttoPdfButton.setText("");
+        toolBar.add(exportToPdfButton = new JButton(new ExportToPdfAction()));
+        exportToPdfButton.setText("");
         toolBar.addSeparator();
         toolBar.add(addPasswordButton = new JButton(new AddAction()));
         toolBar.add(deletePasswordButton = new JButton(new DeleteAction()));
@@ -289,7 +289,7 @@ public final class MyPasswordManager extends JFrame {
         deletePasswordButton.setEnabled(opened);
         changeMasterPassword.setEnabled(opened);
         exportToPdf.setEnabled(opened);
-        exporttoPdfButton.setEnabled(opened);
+        exportToPdfButton.setEnabled(opened);
         closeFile.setEnabled(opened);
         filterTextField.setText("");
         PasswordController.filterPasswords("");
@@ -574,25 +574,20 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser boiteFichier = new JFileChooser();
-            if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
-                File file = boiteFichier.getSelectedFile();
-                if (file == null) {
-                    setCursor(Cursor.getDefaultCursor());
-                    return;
+            ImportFilePanel importFilePanel = new ImportFilePanel();
+            JOptionPane.showMessageDialog(instance, importFilePanel, "", JOptionPane.PLAIN_MESSAGE, null);
+
+            SwingUtilities.invokeLater(() -> {
+                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                try {
+                    PasswordController.importCSV(importFilePanel.getSelectedType(), importFilePanel.getFile());
+                } catch (ApplicationImportException exception) {
+                    Utils.saveError(exception);
+                    JOptionPane.showMessageDialog(instance, getLabel("error.importDashlane"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
                 }
-                SwingUtilities.invokeLater(() -> {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    try {
-                        PasswordController.importDashlaneCSV(file);
-                    } catch (DashlaneImportException exception) {
-                        Utils.saveError(exception);
-                        JOptionPane.showMessageDialog(instance, getLabel("error.importDashlane"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
-                    }
-                    model.fireTableDataChanged();
-                    setCursor(Cursor.getDefaultCursor());
-                });
-            }
+                model.fireTableDataChanged();
+                setCursor(Cursor.getDefaultCursor());
+            });
         }
     }
 
