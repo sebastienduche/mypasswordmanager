@@ -47,9 +47,11 @@ public class ImportFilePanel extends JPanel {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      JFileChooser boiteFichier = new JFileChooser();
-      if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(null)) {
-        File file = boiteFichier.getSelectedFile();
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+      fileChooser.addChoosableFileFilter(Filtre.FILTRE_CSV);
+      if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(null)) {
+        File file = fileChooser.getSelectedFile();
         if (file == null) {
           setCursor(Cursor.getDefaultCursor());
           return;

@@ -3,12 +3,12 @@ package com.passwordmanager;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Filtre extends FileFilter {
 
     public static final Filtre FILTRE_SINFOS = new Filtre("sinfos", Utils.getLabel("filter.file"));
     public static final Filtre FILTRE_PDF = new Filtre("pdf", Utils.getLabel("filter.pdf"));
+    public static final Filtre FILTRE_CSV = new Filtre("csv", Utils.getLabel("filter.csv"));
 
     private final List<String> suffixes;
     private final String description;
@@ -16,7 +16,7 @@ public class Filtre extends FileFilter {
     public Filtre(List<String> suffixes, String description) {
         this.suffixes = suffixes.stream()
                 .map(String::toLowerCase)
-                .collect(Collectors.toList());
+            .toList();
         this.description = description;
     }
 

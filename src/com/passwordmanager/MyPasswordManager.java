@@ -87,7 +87,13 @@ public final class MyPasswordManager extends JFrame {
     public MyPasswordManager() throws HeadlessException {
         instance = this;
         prefs = Preferences.userNodeForPackage(getClass());
-        String locale = prefs.get("MyPassworManager.locale", "en");
+        String locale;
+        if (prefs.get("MyPassworManager.locale", null) != null) { // TODO REMOVE
+            locale = prefs.get("MyPassworManager.locale", "en");
+            prefs.remove("MyPassworManager.locale");
+        } else {
+            locale = prefs.get("MyPasswordManager.locale", "en");
+        }
         Utils.initResources(new Locale(locale));
         saveFile = new JMenuItem(new SaveFileAction());
         importFile = new JMenuItem(new ImportFileAction());
@@ -388,11 +394,11 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser boiteFichier = new JFileChooser();
-            boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-            boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
-            if (JFileChooser.APPROVE_OPTION == boiteFichier.showOpenDialog(instance)) {
-                File file = boiteFichier.getSelectedFile();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+            fileChooser.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(instance)) {
+                File file = fileChooser.getSelectedFile();
                 if (file == null) {
                     setCursor(Cursor.getDefaultCursor());
                     return;
@@ -481,12 +487,12 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser boiteFichier = new JFileChooser();
-            boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-            boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+            fileChooser.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
             if (openedFile == null || !openedFile.exists()) {
-                if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
-                    openedFile = boiteFichier.getSelectedFile();
+                if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(instance)) {
+                    openedFile = fileChooser.getSelectedFile();
                     if (openedFile == null) {
                         setCursor(Cursor.getDefaultCursor());
                         return;
@@ -509,11 +515,11 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser boiteFichier = new JFileChooser();
-            boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-            boiteFichier.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
-            if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
-                File file = boiteFichier.getSelectedFile();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+            fileChooser.addChoosableFileFilter(Filtre.FILTRE_SINFOS);
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(instance)) {
+                File file = fileChooser.getSelectedFile();
                 if (file == null) {
                     setCursor(Cursor.getDefaultCursor());
                     return;
@@ -575,12 +581,14 @@ public final class MyPasswordManager extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             ImportFilePanel importFilePanel = new ImportFilePanel();
-            JOptionPane.showMessageDialog(instance, importFilePanel, "", JOptionPane.PLAIN_MESSAGE, null);
+            JOptionPane.showMessageDialog(instance, importFilePanel, getLabel("menu.importDashlane"), JOptionPane.PLAIN_MESSAGE, null);
 
             SwingUtilities.invokeLater(() -> {
                 setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 try {
                     PasswordController.importCSV(importFilePanel.getSelectedType(), importFilePanel.getFile());
+                    PasswordController.filterPasswords("");
+                    labelCount.setText(Integer.toString(PasswordController.getPasswords().size()));
                 } catch (ApplicationImportException exception) {
                     Utils.saveError(exception);
                     JOptionPane.showMessageDialog(instance, getLabel("error.importDashlane"), getLabel("error"), JOptionPane.ERROR_MESSAGE);
@@ -598,12 +606,12 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JFileChooser boiteFichier = new JFileChooser();
-            boiteFichier.removeChoosableFileFilter(boiteFichier.getFileFilter());
-            boiteFichier.addChoosableFileFilter(Filtre.FILTRE_PDF);
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.removeChoosableFileFilter(fileChooser.getFileFilter());
+            fileChooser.addChoosableFileFilter(Filtre.FILTRE_PDF);
             File exportFile = null;
-            if (JFileChooser.APPROVE_OPTION == boiteFichier.showSaveDialog(instance)) {
-                exportFile = boiteFichier.getSelectedFile();
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(instance)) {
+                exportFile = fileChooser.getSelectedFile();
                 if (exportFile == null) {
                     setCursor(Cursor.getDefaultCursor());
                     return;
@@ -653,7 +661,7 @@ public final class MyPasswordManager extends JFrame {
         }
     }
 
-    class AboutAction extends AbstractAction {
+    static class AboutAction extends AbstractAction {
         public AboutAction() {
             super(getLabel("menu.about"));
         }
@@ -705,7 +713,8 @@ public final class MyPasswordManager extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            prefs.put("MyPassworManager.locale", locale.getLanguage());
+            prefs.remove("MyPassworManager.locale"); // TODO DELETE
+            prefs.put("MyPasswordManager.locale", locale.getLanguage());
             JOptionPane.showMessageDialog(instance, getLabel("languageChanged"), getLabel("information"), JOptionPane.INFORMATION_MESSAGE);
         }
     }

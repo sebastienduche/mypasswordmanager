@@ -16,11 +16,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.passwordmanager.Utils.cleanString;
 import static com.passwordmanager.Utils.removeFromString;
+import static java.util.stream.Collectors.toList;
 
 public class PasswordController {
 
@@ -55,7 +56,7 @@ public class PasswordController {
     return passwordListData.getPasswordDataList()
         .stream()
         .filter(PasswordController::filterPasswords)
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private static boolean filterPasswords(PasswordData passwordData) {
@@ -80,7 +81,8 @@ public class PasswordController {
       if (type == ImportType.DASHLANE) {
         bufferedInputStream.lines().forEach(PasswordController::importDashlaneLine);
       } else if (type == ImportType.APPLE_PASSWORD) {
-        bufferedInputStream.lines().forEach(PasswordController::importAppleLine);
+        // Skip the Title line
+        bufferedInputStream.lines().skip(1).forEach(PasswordController::importAppleLine);
       } else {
         throw new ApplicationImportException("Unknown Program Type: " + type);
       }
@@ -111,6 +113,7 @@ public class PasswordController {
     final String doubleQuote = "\"";
     String[] splitByQuote = line.split(doubleQuote);
     if (splitByQuote.length > 1) {
+      // If there is at least 1 double quote, we must have modulo 2 + 1 elements
       if (splitByQuote.length % 2 == 0) {
         throw new RuntimeException("Can't process this line: " + line);
       }
@@ -118,14 +121,14 @@ public class PasswordController {
         key = UUID.randomUUID().toString();
       }
       StringBuilder newLine = new StringBuilder();
-      boolean first = true;
+      boolean skipTheElement = true;
       for (String s : splitByQuote) {
-        if (first) {
-          first = false;
+        if (skipTheElement) {
+          skipTheElement = false;
           newLine.append(s);
           continue;
         } else {
-          first = true;
+          skipTheElement = true;
         }
         if (s.contains(appleSeparator)) {
           newLine.append(cleanString(s.replaceAll(appleSeparator, key)));
@@ -150,11 +153,7 @@ public class PasswordController {
   }
 
   public static void filterPasswords(String value) {
-    if (value == null) {
-      filter = "";
-    } else {
-      filter = value;
-    }
+    filter = Objects.requireNonNullElse(value, "");
   }
 
   public static String getLastModified() {
